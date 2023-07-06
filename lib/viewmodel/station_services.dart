@@ -20,7 +20,9 @@ void requestLocationPermission() async {
 class StationService extends ChangeNotifier {
   static String baseUrl = "10.0.2.2:8080";
 
-  final String key = 'AIzaSyB7tqa4d4erBKHaZ_fNzBjjN4BRVKrU_iI';
+  final String key = 'AIzaSyADG1lENsRv14KlWdZgXOuMfcl_lf0MaXA';
+  static const String apiKey = '5b3ce3597851110001cf6248f55d7a31499e40848c6848d7de8fa624';
+
   List<Station> _stations = [];
   List<Station> get stations {
     return [..._stations];
@@ -101,12 +103,12 @@ class StationService extends ChangeNotifier {
     var response = await http.get(Uri.parse(url));
     var json = convert.jsonDecode(response.body);
 
-    /* if(json['status'] != 'OK'){
+    if(json['status'] != 'OK'){
      print(json);
     throw Exception('Error fetching directions: ${json['status']}');
-  }*/
+  }
 
-    /*if (json['routes'].isEmpty) {
+    if (json['routes'].isEmpty) {
     throw Exception('No routes found for given origin and destination');
   }
 
@@ -118,10 +120,10 @@ class StationService extends ChangeNotifier {
     'polyline': json['routes'][0]['overview_polyline']['points'],
     'polyline_decoded': PolylinePoints()
         .decodePolyline(json['routes'][0]['overview_polyline']['points']),
-  };*/
+  };
 
     // Temporarily return static data
-    return Future.delayed(const Duration(seconds: 1), () {
+   /* return Future.delayed(const Duration(seconds: 1), () {
       List<PointLatLng> points = createStaticPolylinePoints();
       return {
         'bounds_ne': {
@@ -143,7 +145,8 @@ class StationService extends ChangeNotifier {
         'polyline': 'encodedPolylineString',
         'polyline_decoded': points,
       };
-    });
+    });*/
+    return results;
   }
 
   List<PointLatLng> createStaticPolylinePoints() {
@@ -155,6 +158,26 @@ class StationService extends ChangeNotifier {
     ];
   }
 //return results ;
+
+Future<List<LatLng>> getOpenRouteCoordinates(String startPoint, String endPoint) async {
+    // Requesting for openrouteservice api
+    var response = await http.get(getRouteUrl(startPoint, endPoint) as Uri);
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      List listOfPoints = data['features'][0]['geometry']['coordinates'];
+      List<LatLng> points = listOfPoints
+          .map((p) => LatLng(p[1].toDouble(), p[0].toDouble()))
+          .toList();
+      return points;
+    } else {
+      throw Exception('Failed to load coordinates');
+    }
+  }
+
+String getRouteUrl(String startPoint, String endPoint) {
+    return '$baseUrl?api_key=$apiKey&start=$startPoint&end=$endPoint';
+}
 }
  
  // }

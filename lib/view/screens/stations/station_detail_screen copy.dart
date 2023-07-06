@@ -1,32 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import '../../../model/bus.dart';
 import '../../../model/station.dart';
-import '../../../viewmodel/station_services.dart';
 import '../../components/app_colors.dart';
 import '../../components/stations_bus.dart';
 
-class StationDetailsScreen extends StatefulWidget {
+class StationDetailsScreen2 extends StatefulWidget {
   final Station station;
 
-  const StationDetailsScreen({super.key, required this.station});
+  const StationDetailsScreen2({super.key, required this.station});
 
   @override
-  State<StationDetailsScreen> createState() => _StationDetailsScreenState();
+  State<StationDetailsScreen2> createState() => _StationDetailsScreenState();
 }
 
-class _StationDetailsScreenState extends State<StationDetailsScreen> {
-  final Set<Marker> _markers = <Marker>{};
-  final Set<Polygon> _polygons = <Polygon>{};
-  final Set<Polyline> _polylines = <Polyline>{};
-  List<LatLng> polygonLatLngs = <LatLng>[];
-
-  int _polygonIdCounter = 1;
-  int _polylineIdCounter = 1;
-
-  final StationService stationService = StationService();
+class _StationDetailsScreenState extends State<StationDetailsScreen2> {
+  List listOfPoints = [];
+  List<LatLng> points = [];
 
   String calculateTimeRemaining(String arrivalTime) {
     final DateTime now = DateTime.now();
@@ -57,61 +51,30 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
     _getAndSetDirections();
   }
 
+  getRouteUrl(String startPoint, String endPoint) {
+    const String baseUrl =
+        'https://api.openrouteservice.org/v2/directions/driving-car';
+    const String apiKey =
+        '5b3ce3597851110001cf6248f55d7a31499e40848c6848d7de8fa624';
+    print("start point " + startPoint);
+    print(endPoint);
+    return Uri.parse(
+        '$baseUrl?api_key=$apiKey&start=$startPoint&end=$endPoint');
+  }
+
   void _getAndSetDirections() async {
-    Map<String, dynamic> directions = await stationService.getDirections(
-      '${widget.station.location.lat},${widget.station.location.lng}',
-      '36.84790,10.26857',
-    );
-
-    print('Directions: $directions');
-
+    var response = await http.get(getRouteUrl(
+        "1.243344,6.145332", '1.2160116523406839,6.125231015668568'));
+    print(response.body);
     setState(() {
-      _setPolyline(directions['polyline_decoded']);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        listOfPoints = data['features'][0]['geometry']['coordinates'];
+        points = listOfPoints
+            .map((p) => LatLng(p[1].toDouble(), p[0].toDouble()))
+            .toList();
+      }
     });
-  }
-  /*void _getAndSetDirections() async {
-  List<LatLng> directions = await stationService.getOpenRouteCoordinates(
-    LatLng(widget.station.location.lat, widget.station.location.lng) as String,
-    const LatLng(36.84790,10.26857) as String,
-  );
-
-  print('Directions: $directions');
-
-  setState(() {
-    _setPolyline(directions.cast<PointLatLng>());
-  });
-}*/
-
-  void _setPolygon() {
-    final String polygonIdVal = 'polygon_$_polygonIdCounter';
-    _polygonIdCounter++;
-
-    _polygons.add(
-      Polygon(
-        polygonId: PolygonId(polygonIdVal),
-        points: polygonLatLngs,
-        strokeWidth: 2,
-        fillColor: const Color.fromARGB(255, 230, 11, 3),
-      ),
-    );
-  }
-
-  void _setPolyline(List<PointLatLng> points) {
-    final String polylineIdVal = 'polyline_$_polylineIdCounter';
-    _polylineIdCounter++;
-
-    _polylines.add(
-      Polyline(
-        polylineId: PolylineId(polylineIdVal),
-        width: 2,
-        color: Colors.blue,
-        points: points
-            .map(
-              (point) => LatLng(point.latitude, point.longitude),
-            )
-            .toList(),
-      ),
-    );
   }
 
   @override
@@ -120,28 +83,52 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
       child: Scaffold(
         body: Stack(
           children: <Widget>[
-            GoogleMap(
-              mapType: MapType.normal,
-              initialCameraPosition: CameraPosition(
-                target: LatLng(
-                    widget.station.location.lat, widget.station.location.lng),
-                zoom: 17.7746,
-              ),
-              markers: {
-                Marker(
-                  markerId: MarkerId(widget.station.id),
-                  position: LatLng(
-                      widget.station.location.lat, widget.station.location.lng),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+            FlutterMap(
+              
+              options: MapOptions(zoom: 15, center: LatLng(6.131015, 1.223898)),
+              children: [
+                // Layer that adds the map
+                TileLayer(
+                  urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  userAgentPackageName: 'dev.fleaflet.flutter_map.example',
                 ),
-                Marker(
-                  markerId: const MarkerId("septeo"),
-                  position: const LatLng(36.84790, 10.26857),
-                  icon: BitmapDescriptor.defaultMarkerWithHue(
-                      BitmapDescriptor.hueBlue),
+                // Layer that adds points the map
+                MarkerLayer(
+                  markers: [
+                    // First Marker
+                    Marker(
+                      point: LatLng(6.145332, 1.243342),
+                      width: 80,
+                      height: 80,
+                      builder: (context) => IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.location_on),
+                        color: Colors.green,
+                        iconSize: 45,
+                      ),
+                    ),
+                    // Second Marker
+                    Marker(
+                      point: LatLng(6.125231015668568, 1.2160116523406839),
+                      width: 80,
+                      height: 80,
+                      builder: (context) => IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.location_on),
+                        color: Colors.red,
+                        iconSize: 45,
+                      ),
+                    ),
+                  ],
                 ),
-              },
-              polylines: _polylines,
+                PolylineLayer(
+                  polylineCulling: false,
+                  polylines: [
+                    Polyline(
+                        points: points, color: const Color.fromARGB(255, 0, 4, 255), strokeWidth: 5),
+                  ],
+                ),
+              ],
             ),
             Positioned(
               top: 10,
@@ -177,7 +164,7 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
                   height: MediaQuery.of(context).size.height * 0.25,
                   width: MediaQuery.of(context).size.width,
                   decoration: const BoxDecoration(
-                    color: Color.fromARGB(0, 255, 255, 255) ,
+                    color: Color.fromARGB(0, 255, 255, 255),
                     borderRadius: BorderRadius.all(Radius.circular(30)),
                     boxShadow: [
                       BoxShadow(
@@ -194,9 +181,9 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
                   child: ListView.separated(
                     itemCount: widget.station.arrivalTimes.length,
                     itemBuilder: (context, index) {
-                      ArrivalTime arrivalTime = widget.station.arrivalTimes[index];
-                      Bus bus = arrivalTime
-                          .bus; 
+                      ArrivalTime arrivalTime =
+                          widget.station.arrivalTimes[index];
+                      Bus bus = arrivalTime.bus;
                       return BusItemCard(
                         arrivalTime: arrivalTime,
                         bus: bus,
@@ -204,8 +191,7 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
                       );
                     },
                     separatorBuilder: (context, index) => const Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 30.0), 
+                      padding: EdgeInsets.symmetric(horizontal: 30.0),
                       child: Divider(
                         color: Colors.grey,
                         height: 1,
