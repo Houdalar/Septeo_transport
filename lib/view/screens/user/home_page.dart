@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../components/app_colors.dart';
+import 'admin_screen.dart';
 import 'home_screen.dart';
 
 
 class Home extends StatefulWidget {
+  const Home({super.key});
+
   @override
   HomeState createState() => HomeState();
 }
@@ -91,7 +94,7 @@ class HomeState extends State<Home> {
                               curve: Curves.fastLinearToSlowEaseIn,
                               child: Text(
                                 index == currentIndex
-                                    ? '${listOfStrings[index]}'
+                                    ? listOfStrings[index]
                                     : '',
                                 style: const TextStyle(
                                   color: AppColors.auxiliaryOffWhite,
@@ -130,7 +133,7 @@ class HomeState extends State<Home> {
       ),
       body: IndexedStack(
         index: currentIndex,
-        children: [
+        children: const [
           HomePage(),
           AdminSpace(),
           SettingsPage(),
@@ -154,19 +157,10 @@ class HomeState extends State<Home> {
 
 
 
-class AdminSpace extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Welcome to the Admin Space!',
-        style: TextStyle(fontSize: 24),
-      ),
-    );
-  }
-}
 
 class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Center(

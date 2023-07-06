@@ -48,10 +48,10 @@ class UserViewModel extends ChangeNotifier {
             role = Role.Employee;
             break;
         }
-        prefs.setString("userid", decodedToken["id"]);
+        /*prefs.setString("userid", decodedToken["id"]);
         prefs.setString("username", decodedToken["username"]);
         prefs.setString("Role", role.toString()); 
-        prefs.setString("email", decodedToken["email"]);
+        prefs.setString("email", decodedToken["email"]);*/
 
         Navigator.pushReplacementNamed(context, '/home');
 
