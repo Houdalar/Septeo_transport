@@ -183,7 +183,7 @@ class _StationDetailsScreenState extends State<StationDetailsScreen2> {
                     itemBuilder: (context, index) {
                       ArrivalTime arrivalTime =
                           widget.station.arrivalTimes[index];
-                      Bus bus = arrivalTime.bus;
+                      Bus bus = arrivalTime.bus!;
                       return BusItemCard(
                         arrivalTime: arrivalTime,
                         bus: bus,

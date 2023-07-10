@@ -12,8 +12,8 @@ class UserViewModel extends ChangeNotifier {
 
   UserViewModel();
 
-  static Future<void> login(String? email, String? password,
-      BuildContext context) async {
+  static Future<void> login(
+      String? email, String? password, BuildContext context) async {
     Map<String, dynamic> userData = {"email": email, "password": password};
 
     Map<String, String> headers = {
@@ -25,7 +25,7 @@ class UserViewModel extends ChangeNotifier {
             body: json.encode(userData), headers: headers)
         .then((http.Response response) async {
       if (response.statusCode == 200) {
-       Map<String, dynamic> userData = json.decode(response.body);
+        Map<String, dynamic> userData = json.decode(response.body);
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("token", userData["token"]);
@@ -34,7 +34,7 @@ class UserViewModel extends ChangeNotifier {
         Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
 
         Role role;
-        switch(decodedToken['role']) {
+        switch (decodedToken['role']) {
           case 'Admin':
             role = Role.Admin;
             break;
@@ -54,7 +54,6 @@ class UserViewModel extends ChangeNotifier {
         prefs.setString("email", decodedToken["email"]);*/
 
         Navigator.pushReplacementNamed(context, '/home');
-
       } else if (response.statusCode == 400) {
         showDialog(
             context: context,
@@ -62,7 +61,8 @@ class UserViewModel extends ChangeNotifier {
               return const AlertDialog(
                   title: Text("Sign in failed",
                       style: TextStyle(color: AppColors.primaryOrange)),
-                  content: Text("Wrong password", style: TextStyle(color: AppColors.primaryTextColor)));
+                  content: Text("Wrong password",
+                      style: TextStyle(color: AppColors.primaryTextColor)));
             });
       } else if (response.statusCode == 401) {
         showDialog(
@@ -72,7 +72,8 @@ class UserViewModel extends ChangeNotifier {
                   title: Text("Sign in failed",
                       style: TextStyle(color: AppColors.primaryOrange)),
                   content: Text(
-                      "The email address is not associated with any account. please check and try again!", style: TextStyle(color: AppColors.primaryTextColor)));
+                      "The email address is not associated with any account. please check and try again!",
+                      style: TextStyle(color: AppColors.primaryTextColor)));
             });
       } else {
         showDialog(
@@ -81,12 +82,21 @@ class UserViewModel extends ChangeNotifier {
               return const AlertDialog(
                   title: Text("Something went wrong",
                       style: TextStyle(color: AppColors.primaryOrange)),
-                  content: Text(
-                      "Something went wrong please try again later", style: TextStyle(color: AppColors.primaryTextColor)));
+                  content: Text("Something went wrong please try again later",
+                      style: TextStyle(color: AppColors.primaryTextColor)));
             });
       }
     });
   }
 
- 
+  Future<List<User>> getDrivers() async {
+    final response = await http.get(Uri.parse('http://$baseUrl/drivers'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((item) => User.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load drivers');
+    }
   }
+}

@@ -23,9 +23,9 @@ class Station {
       name: json['name'],
       address: json['address'],
       location: Location.fromJson(json['location']),
-      arrivalTimes: (json['arrivaltime'] as List)
-          .map((e) => ArrivalTime.fromJson(e))
-          .toList(),
+      arrivalTimes: (json['arrivaltime'] as List?)
+    ?.map((e) => ArrivalTime.fromJson(e))
+    .toList() ?? [],
     );
   }
 }
@@ -42,13 +42,16 @@ class Location {
 }
 
 class ArrivalTime {
-  final Bus bus;
-  final String time;
+  final Bus? bus;
+  final String? time;
 
   ArrivalTime({required this.bus, required this.time});
 
   factory ArrivalTime.fromJson(Map<String, dynamic> json) {
-    return ArrivalTime(bus:Bus.fromJson(json['bus']), time: json['time']);
+    return ArrivalTime(
+      bus: json['bus'] != null ? Bus.fromJson(json['bus']) : null, // add null check
+      time: json['time'],
+    );
   }
 }
 

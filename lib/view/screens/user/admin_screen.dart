@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
-import 'package:septeo_transport/view/screens/user/station_management.dart';
+import 'package:septeo_transport/view/screens/stations/station_management.dart';
 
-import 'bus_management.dart';
+import '../buses/bus_management.dart';
 
 class AdminSpace extends StatefulWidget {
   const AdminSpace({Key? key}) : super(key: key);

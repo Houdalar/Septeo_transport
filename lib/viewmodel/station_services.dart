@@ -21,7 +21,8 @@ class StationService extends ChangeNotifier {
   static String baseUrl = "10.0.2.2:8080";
 
   final String key = 'AIzaSyADG1lENsRv14KlWdZgXOuMfcl_lf0MaXA';
-  static const String apiKey = '5b3ce3597851110001cf6248f55d7a31499e40848c6848d7de8fa624';
+  static const String apiKey =
+      '5b3ce3597851110001cf6248f55d7a31499e40848c6848d7de8fa624';
 
   List<Station> _stations = [];
   List<Station> get stations {
@@ -30,9 +31,9 @@ class StationService extends ChangeNotifier {
 
   StationService();
 
-  Future<Station> createStation(Station station) async {
+  Future<void> createStation(Station station, BuildContext context) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/station'),
+      Uri.parse('http://$baseUrl/station'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -50,9 +51,38 @@ class StationService extends ChangeNotifier {
     );
 
     if (response.statusCode == 200) {
-      return Station.fromJson(jsonDecode(response.body));
+      // return Station.fromJson(jsonDecode(response.body));
+      Navigator.pop(context);
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Success'),
+              content: Text('Station created successfully.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          });
     } else {
-      throw Exception('Failed to create station');
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text(
+                  'Failed to create station. ${jsonDecode(response.body)['message']}'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          });
     }
   }
 
@@ -103,27 +133,27 @@ class StationService extends ChangeNotifier {
     var response = await http.get(Uri.parse(url));
     var json = convert.jsonDecode(response.body);
 
-    if(json['status'] != 'OK'){
-     print(json);
-    throw Exception('Error fetching directions: ${json['status']}');
-  }
+    if (json['status'] != 'OK') {
+      print(json);
+      throw Exception('Error fetching directions: ${json['status']}');
+    }
 
     if (json['routes'].isEmpty) {
-    throw Exception('No routes found for given origin and destination');
-  }
+      throw Exception('No routes found for given origin and destination');
+    }
 
-  var results = {
-    'bounds_ne': json['routes'][0]['bounds']['northeast'],
-    'bounds_sw': json['routes'][0]['bounds']['southwest'],
-    'start_location': json['routes'][0]['legs'][0]['start_location'],
-    'end_location': json['routes'][0]['legs'][0]['end_location'],
-    'polyline': json['routes'][0]['overview_polyline']['points'],
-    'polyline_decoded': PolylinePoints()
-        .decodePolyline(json['routes'][0]['overview_polyline']['points']),
-  };
+    var results = {
+      'bounds_ne': json['routes'][0]['bounds']['northeast'],
+      'bounds_sw': json['routes'][0]['bounds']['southwest'],
+      'start_location': json['routes'][0]['legs'][0]['start_location'],
+      'end_location': json['routes'][0]['legs'][0]['end_location'],
+      'polyline': json['routes'][0]['overview_polyline']['points'],
+      'polyline_decoded': PolylinePoints()
+          .decodePolyline(json['routes'][0]['overview_polyline']['points']),
+    };
 
     // Temporarily return static data
-   /* return Future.delayed(const Duration(seconds: 1), () {
+    /* return Future.delayed(const Duration(seconds: 1), () {
       List<PointLatLng> points = createStaticPolylinePoints();
       return {
         'bounds_ne': {
@@ -159,7 +189,8 @@ class StationService extends ChangeNotifier {
   }
 //return results ;
 
-Future<List<LatLng>> getOpenRouteCoordinates(String startPoint, String endPoint) async {
+  Future<List<LatLng>> getOpenRouteCoordinates(
+      String startPoint, String endPoint) async {
     // Requesting for openrouteservice api
     var response = await http.get(getRouteUrl(startPoint, endPoint) as Uri);
 
@@ -175,9 +206,37 @@ Future<List<LatLng>> getOpenRouteCoordinates(String startPoint, String endPoint)
     }
   }
 
-String getRouteUrl(String startPoint, String endPoint) {
+  String getRouteUrl(String startPoint, String endPoint) {
     return '$baseUrl?api_key=$apiKey&start=$startPoint&end=$endPoint';
+  }
+
+  void deleteStation(String id, BuildContext context) async {
+    final response = await http.delete(
+      Uri.parse('http://$baseUrl/station/$id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    // print(response.statusCode);
+
+    if (response.statusCode != 200) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('Failed to create bus'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          });
+    }
+  }
 }
-}
+
  
  // }

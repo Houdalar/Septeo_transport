@@ -21,7 +21,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'My App',
-      theme: ThemeData(
+      theme: ThemeData(backgroundColor: AppColors.primaryOrange,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.primaryOrange,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: AppColors.primaryDarkBlue,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
         textTheme: GoogleFonts.josefinSansTextTheme(
           Theme.of(context).textTheme,
         ).apply(

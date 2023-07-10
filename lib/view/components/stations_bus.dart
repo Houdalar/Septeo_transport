@@ -6,7 +6,7 @@ import '../../model/station.dart';
 
 class BusItemCard extends StatelessWidget {
   final ArrivalTime arrivalTime;
-  final Bus bus;
+  final Bus? bus;
   final Function calculateTimeRemaining;
 
   BusItemCard({
@@ -45,14 +45,14 @@ class BusItemCard extends StatelessWidget {
                     height: 20,
                   ),
                   Text(
-                    bus.busNumber,
+                    bus!.busNumber,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  Text(arrivalTime.time,
+                  Text(arrivalTime.time!,
                       style: const TextStyle(fontSize: 13, color: Colors.grey)),
                 ],
               ),

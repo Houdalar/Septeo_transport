@@ -1,42 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
+import 'package:septeo_transport/view/screens/buses/add_bus_sheet.dart';
 
-import '../../../model/station.dart';
-import '../../../viewmodel/station_services.dart';
-import '../../components/station_item.dart';
-import '../stations/station_detail_screen.dart';
-import 'add_station_sheet.dart';
+import '../../../model/bus.dart';
+import '../../../viewmodel/bus_services.dart';
+import '../../components/bus_item.dart';
 
-class StationManagement extends StatefulWidget {
+
+class BusManagement extends StatefulWidget {
   @override
-  _StationManagementState createState() => _StationManagementState();
+  _BusManagementState createState() => _BusManagementState();
 }
 
-class _StationManagementState extends State<StationManagement> {
-  late List<Station> _stationList;
-
-  @override
-  void initState() {
-    super.initState();
-   //  _getStationList();
-  }
-// get the list of stations from the server
-_getStationList() async {
-    var stations = await StationService().getStations();
-    setState(() {
-      _stationList = stations;
-    });
-  }
+class _BusManagementState extends State<BusManagement> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: FutureBuilder<List<Station>>(
-          future: StationService().getStations(),
+        body: FutureBuilder<List<Bus>>(
+          future: BusService().getBus(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
+              print(snapshot.error);
               return const Center(child: Text('Error loading data'));
             } else {
               return Padding(
@@ -44,8 +31,8 @@ _getStationList() async {
                 child: ListView.builder(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
-                    var station = snapshot.data![index];
-                    return StationCard(station: station);
+                    var bus = snapshot.data![index];
+                    return BusCard(bus: bus);  // You will need to define this BusCard widget
                   },
                 ),
               );
@@ -57,15 +44,14 @@ _getStationList() async {
             showModalBottomSheet(
               context: context,
               builder: (context) {
-                return AddStationSheet();
+                return AddBusSheet();  // This will need to be defined too
               },
             );
           },
-          backgroundColor: AppColors.secondaryLightBlue,
+          backgroundColor: AppColors.secondaryLightOrange,
           child: const Icon(Icons.add),
         ),
       ),
     );
   }
 }
-

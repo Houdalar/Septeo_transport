@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:septeo_transport/view/components/app_colors.dart';
 
-import '../../model/station.dart';
-import '../screens/stations/station_detail_screen.dart';
-import '../../viewmodel/station_services.dart';
-import 'app_colors.dart';
+import '../../model/bus.dart';
+import '../../viewmodel/bus_services.dart';
 
-class StationCard extends StatelessWidget {
-  final Station station;
+class BusCard extends StatelessWidget {
+  final Bus bus;
 
-  const StationCard({Key? key, required this.station}) : super(key: key);
+  BusCard({required this.bus});
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key(station.id),
+      key: Key(bus.id),
       confirmDismiss: (direction) async {
         return await showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text("Confirm"),
-              content: const Text("Are you sure you wish to delete this station?"),
+              content: const Text("Are you sure you wish to delete this bus?"),
               actions: <Widget>[
                 TextButton(
                     onPressed: () => Navigator.of(context).pop(true),
@@ -37,22 +36,24 @@ class StationCard extends StatelessWidget {
       onDismissed: (direction) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Station ${station.name} deleted"),
+            content: Text("Bus ${bus.busNumber} deleted"),
           ),
         );
-        StationService().deleteStation(station.id , context);
+
+        BusService().deleteBus(bus.id, context);
       },
       background: Container(
-        color: AppColors.secondaryLightOrange,
-        child: Align(
+        color:AppColors.secondaryLightOrange,
+        child: const Align(
+          alignment: Alignment.centerRight,
           child: Padding(
-            padding: const EdgeInsets.only(right: 20.0),
+            padding: EdgeInsets.only(right: 20.0),
             child: Icon(
               Icons.delete,
               color: Colors.white,
+              size: 40,
             ),
           ),
-          alignment: Alignment.centerRight,
         ),
       ),
       child: Card(
@@ -63,26 +64,20 @@ class StationCard extends StatelessWidget {
         child: ListTile(
           contentPadding: const EdgeInsets.all(15.0),
           title: Text(
-            station.name,
+            bus.busNumber,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18.0,
             ),
           ),
-          subtitle: Text(
-            station.address,
-            style: const TextStyle(
-              fontSize: 16.0,
-            ),
-          ),
           trailing: IconButton(
             icon: const Icon(Icons.arrow_forward_ios),
             onPressed: () {
-              Navigator.of(context).push(
+              /* Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => StationDetailsScreen(station: station),
+                  builder: (context) => StationDetailsScreen(station:station),
                 ),
-              );
+              );*/
             },
           ),
         ),

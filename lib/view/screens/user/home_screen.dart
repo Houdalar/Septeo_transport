@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
           bus: Bus(
             id: "1",
             stations: [],
-            driver: "Driver 1",
+            
             capacity: 50,
             // startDate: DateTime.now(),
             busNumber: "B25",
@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
           bus: Bus(
             id: "2",
             stations: [],
-            driver: "Driver 2",
+            
             capacity: 60,
             // startDate: DateTime.now(),
             busNumber: "B26",
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
           bus: Bus(
             id: "2",
             stations: [],
-            driver: "Driver 2",
+            
             capacity: 60,
             // startDate: DateTime.now(),
             busNumber: "B26",
@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
           bus: Bus(
             id: "1",
             stations: [],
-            driver: "Driver 1",
+            
             capacity: 50,
             // startDate: DateTime.now(),
             busNumber: "B25",
@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
           bus: Bus(
             id: "1",
             stations: [],
-            driver: "Driver 1",
+            
             capacity: 50,
             // startDate: DateTime.now(),
             busNumber: "B25",
@@ -91,7 +91,7 @@ class _HomePageState extends State<HomePage> {
           bus: Bus(
             id: "1",
             stations: [],
-            driver: "Driver 1",
+           
             capacity: 50,
             // startDate: DateTime.now(),
             busNumber: "B25",
@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
           bus: Bus(
             id: "2",
             stations: [],
-            driver: "Driver 2",
+            
             capacity: 60,
             // startDate: DateTime.now(),
             busNumber: "B26",
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
           bus: Bus(
             id: "3",
             stations: [],
-            driver: "Driver 3",
+           
             capacity: 55,
             //startDate: DateTime.now(),
             busNumber: "B27",
@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
           bus: Bus(
             id: "4",
             stations: [],
-            driver: "Driver 4",
+            
             capacity: 65,
             // startDate: DateTime.now(),
             busNumber: "B28",
@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
             bus: Bus(
               id: "3",
               stations: [],
-              driver: "Driver 3",
+             
               capacity: 55,
               // startDate: DateTime.now(),
               busNumber: "B27",
@@ -169,7 +169,7 @@ class _HomePageState extends State<HomePage> {
             bus: Bus(
               id: "4",
               stations: [],
-              driver: "Driver 4",
+              
               capacity: 65,
 //startDate: DateTime.now(),
               busNumber: "B28",
@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
             bus: Bus(
               id: "3",
               stations: [],
-              driver: "Driver 3",
+              
               capacity: 55,
               //   startDate: DateTime.now(),
               busNumber: "B27",
@@ -199,7 +199,7 @@ class _HomePageState extends State<HomePage> {
             bus: Bus(
               id: "4",
               stations: [],
-              driver: "Driver 4",
+              
               capacity: 65,
               //  startDate: DateTime.now(),
               busNumber: "B28",
@@ -210,7 +210,7 @@ class _HomePageState extends State<HomePage> {
       bus: Bus(
         id: "",
         stations: [],
-        driver: "",
+        
         capacity: 50,
         busNumber: "B25",
       ),
