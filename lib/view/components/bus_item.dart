@@ -3,6 +3,7 @@ import 'package:septeo_transport/view/components/app_colors.dart';
 
 import '../../model/bus.dart';
 import '../../viewmodel/bus_services.dart';
+import '../screens/buses/bus_details.dart';
 
 class BusCard extends StatelessWidget {
   final Bus bus;
@@ -73,11 +74,11 @@ class BusCard extends StatelessWidget {
           trailing: IconButton(
             icon: const Icon(Icons.arrow_forward_ios),
             onPressed: () {
-              /* Navigator.of(context).push(
+               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => StationDetailsScreen(station:station),
+                  builder: (context) => BusDetailsScreen(bus:bus),
                 ),
-              );*/
+              );
             },
           ),
         ),

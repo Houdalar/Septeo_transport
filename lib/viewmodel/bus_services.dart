@@ -27,17 +27,19 @@ class BusService extends ChangeNotifier {
 
   BusService();
 
+
+
   Future<List<Bus>> getBus() async {
     final String url = 'http://$baseUrl/buses';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       Iterable jsonResponse = jsonDecode(response.body);
-      List<Bus> bus =
-          List<Bus>.from(jsonResponse.map((model) => Bus.fromJson(model)));
+      print('Decoded response: $jsonResponse');
+      List<Bus> bus = List<Bus>.from(jsonResponse.map((model) => Bus.fromJson(model)));
       return bus;
     } else {
-      throw Exception('Failed to load stations');
+      throw Exception('Failed to load buses');
     }
   }
 
@@ -90,7 +92,7 @@ class BusService extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteBus(String id, BuildContext context) async {
+   Future<void> deleteBus(String id, BuildContext context) async {
     final response = await http.delete(
       Uri.parse('http://$baseUrl/bus/$id'),
       headers: <String, String>{

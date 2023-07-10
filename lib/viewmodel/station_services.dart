@@ -31,6 +31,29 @@ class StationService extends ChangeNotifier {
 
   StationService();
 
+  static Future<List<Station>> fetchStations(
+    List<String> ids,
+  ) async {
+    final response = await http.post(
+      Uri.parse('http://$baseUrl/station/buses'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'ids': ids,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      var stationList = json.decode(response.body) as List;
+      List<Station> stations =
+          stationList.map((i) => Station.fromJson(i)).toList();
+      return stations;
+    } else {
+      throw Exception('Failed to load stations');
+    }
+  }
+
   Future<void> createStation(Station station, BuildContext context) async {
     final response = await http.post(
       Uri.parse('http://$baseUrl/station'),

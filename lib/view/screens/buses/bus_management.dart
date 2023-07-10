@@ -23,7 +23,7 @@ class _BusManagementState extends State<BusManagement> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              print(snapshot.error);
+              print( snapshot.error);
               return const Center(child: Text('Error loading data'));
             } else {
               return Padding(
