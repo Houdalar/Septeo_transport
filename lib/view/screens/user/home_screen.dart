@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/model/bus.dart';
-import 'package:septeo_transport/view/components/app_colors.dart';
 
 import '../../../model/planning.dart';
 import '../../../model/station.dart';

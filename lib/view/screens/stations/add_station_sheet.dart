@@ -7,6 +7,8 @@ import 'package:place_picker/place_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class AddStationSheet extends StatefulWidget {
+  const AddStationSheet({super.key});
+
   @override
   _AddStationSheetState createState() => _AddStationSheetState();
 }
@@ -48,7 +50,7 @@ class _AddStationSheetState extends State<AddStationSheet> {
           builder: (context) => PlacePicker(
             "AIzaSyADG1lENsRv14KlWdZgXOuMfcl_lf0MaXA",
             displayLocation: const LatLng(36.84790, 10.26857),
-            defaultLocation: LatLng(36.84790, 10.26857),
+            defaultLocation: const LatLng(36.84790, 10.26857),
           ),
         ),
       );

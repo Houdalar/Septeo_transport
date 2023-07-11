@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:septeo_transport/model/bus.dart';
 import 'package:septeo_transport/model/station.dart';
-
-import '../../../viewmodel/bus_services.dart';
+import 'package:septeo_transport/view/components/app_colors.dart';
 import '../../../viewmodel/station_services.dart';
-import '../../components/station_item.dart';
-//import 'package:septeo_transport/view/screens/bus/edit_bus_screen.dart';
+import '../../components/timeline_station.dart';
+import 'details_tab.dart';
+import 'stations_tab.dart';
 
 class BusDetailsScreen extends StatefulWidget {
   final Bus bus;
 
-  BusDetailsScreen({required this.bus});
+  const BusDetailsScreen({super.key, required this.bus});
 
   @override
   _BusDetailsScreenState createState() => _BusDetailsScreenState();
@@ -20,6 +20,7 @@ class BusDetailsScreen extends StatefulWidget {
 class _BusDetailsScreenState extends State<BusDetailsScreen> {
   late GoogleMapController mapController;
   final LatLng _center = const LatLng(36.84790, 10.26857);
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -31,27 +32,35 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
     return stations;
   }
 
-  Future<Set<Polyline>> fetchPolylines() async {
-    // Call the API to fetch the stations
-    List<Station> stations = await StationService.fetchStations(widget.bus.stations);
-    
-    // Create a PolylineId
-    PolylineId id = PolylineId('poly');
-    
-    // Create LatLng list
+  Set<Marker> createMarkers(List<Station> stations) {
+    return stations.map((station) {
+      return Marker(
+        markerId: MarkerId(station.id),
+        position: LatLng(station.location.lat, station.location.lng),
+        infoWindow: InfoWindow(
+          title: station.name,
+          snippet: station.address,
+        ),
+      );
+    }).toSet();
+  }
+
+  Set<Polyline> createPolylines(List<Station> stations) {
+    PolylineId id = const PolylineId('poly');
+
     List<LatLng> polylineCoordinates = [];
-    stations.forEach((station) {
-      polylineCoordinates.add(LatLng(station.location.lat, station.location.lng));
-    });
-    
-    // Create a Polyline instance
+    for (var station in stations) {
+      polylineCoordinates
+          .add(LatLng(station.location.lat, station.location.lng));
+    }
+
     Polyline polyline = Polyline(
       polylineId: id,
       color: Colors.red,
       points: polylineCoordinates,
       width: 3,
     );
-    
+
     return {polyline};
   }
 
@@ -65,43 +74,26 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
               future: fetchStations(),
               builder: (BuildContext context,
                   AsyncSnapshot<List<Station>> snapshot) {
-                if (snapshot.hasData) {
-                  Set<Marker> markers = snapshot.data!.map((station) {
-                    return Marker(
-                      markerId: MarkerId(station.id),
-                      position:
-                          LatLng(station.location.lat, station.location.lng),
-                      infoWindow: InfoWindow(
-                        title: station.name,
-                        snippet: station.address,
-                      ),
-                    );
-                  }).toSet();
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  List<Station> stations = snapshot.data!;
+                  Set<Marker> markers = createMarkers(stations);
+                  Set<Polyline> polylines = createPolylines(stations);
 
-                  return FutureBuilder<Set<Polyline>>(
-                    future: fetchPolylines(),
-                    builder: (BuildContext context, AsyncSnapshot<Set<Polyline>> polylineSnapshot) {
-                      if(polylineSnapshot.hasData) {
-                   return GoogleMap(
+                  return GoogleMap(
                     cameraTargetBounds: CameraTargetBounds.unbounded,
                     mapType: MapType.normal,
                     onMapCreated: _onMapCreated,
                     initialCameraPosition: CameraPosition(
                       target: _center,
-                      zoom: 8.0,
+                      zoom: 17.0,
                     ),
                     markers: markers,
-                    polylines: polylineSnapshot.data!,
-                    
+                    polylines: polylines,
                   );
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    },
-                  );
-                } else {
-                  // You can return a placeholder here
-                  return CircularProgressIndicator();
                 }
               },
             ),
@@ -111,59 +103,78 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
               maxChildSize: 0.8,
               builder:
                   (BuildContext context, ScrollController scrollController) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: DefaultTabController(
-                    length: 2,
-                    child: Column(
-                      children: [
-                        const TabBar(
-                          tabs: [
-                            Tab(text: 'Stations'),
-                            Tab(text: 'Details'),
-                          ],
-                        ),
-                        Expanded(
-                          child: TabBarView(
-                            children: [
-                              ListView.builder(
-                                controller: scrollController,
-                                itemCount: widget.bus.stations
-                                    .length, // replace with your station count
-                                itemBuilder:
-                                    (BuildContext context, int index) {},
-                              ),
-                              SingleChildScrollView(
-                                controller: scrollController,
-                                child: Column(
-                                  children: [
-                                    // Here, add the rest of your bus details and an edit button
-                                    TextButton(
-                                      onPressed: () {
-                                        /*  Navigator.push(
-                                          context,
-                                          MaterialPageRoute(builder: (context) => EditBusScreen(bus: widget.bus)),
-                                        );*/
-                                      },
-                                      child: const Text("Edit"),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                return FutureBuilder<List<Station>>(
+                  future: fetchStations(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Station>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<Station> stations = snapshot.data!;
+                      return createStationList(stations,
+                          scrollController); // Create station list function
+                    }
+                  },
                 );
               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget createStationList(
+      List<Station> stations, ScrollController scrollController) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      child: DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            const SizedBox(
+              height: 3,
+              child: Center(
+                child: Icon(
+                  Icons.drag_handle,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const TabBar(
+              labelStyle: TextStyle(fontSize: 18),
+              indicatorColor: AppColors.primaryOrange,
+              labelColor: AppColors.primaryOrange,
+              unselectedLabelColor: Colors.grey,
+              indicatorWeight: 1,
+              indicatorPadding: EdgeInsetsDirectional.symmetric(horizontal: 50),
+              tabs: [
+                Tab(
+                  text: 'stations',
+                ),
+                Tab(text: 'details'),
+              ],
+            ),
+            const SizedBox(height: 30),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  StationsTab(
+                      stations: stations, scrollController: scrollController),
+                  BusDetailsTab(
+                      scrollController: scrollController, bus: widget.bus),
+                ],
+              ),
             ),
           ],
         ),

@@ -21,8 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'My App',
-      theme: ThemeData(backgroundColor: AppColors.primaryOrange,
-      appBarTheme: const AppBarTheme(
+      theme: ThemeData(appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.primaryOrange,
         elevation: 0,
         centerTitle: true,
@@ -37,7 +36,22 @@ class MyApp extends StatelessWidget {
         ).apply(
           bodyColor: AppColors.primaryDarkBlue,
           displayColor: AppColors.primaryDarkBlue,
-        ),
+        ), 
+       /* colorScheme: const ColorScheme.light(
+          primary: AppColors.primaryOrange,
+          primaryVariant: AppColors.primaryDarkBlue,
+          secondary: AppColors.secondaryDarkOrange,
+          secondaryVariant: AppColors.secondaryDarkBlue,
+          surface: AppColors.primaryDarkBlue,
+          background: AppColors.primaryDarkBlue,
+          error: AppColors.primaryDarkBlue,
+          onPrimary: AppColors.primaryDarkBlue,
+          onSecondary: AppColors.primaryDarkBlue,
+          onSurface: AppColors.primaryDarkBlue,
+          onBackground: AppColors.primaryDarkBlue,
+          onError: AppColors.primaryDarkBlue,
+          brightness: Brightness.light,
+        ),*/
       ),
       initialRoute: '/',
       routes: {

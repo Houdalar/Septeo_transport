@@ -24,7 +24,7 @@ class StationService extends ChangeNotifier {
   static const String apiKey =
       '5b3ce3597851110001cf6248f55d7a31499e40848c6848d7de8fa624';
 
-  List<Station> _stations = [];
+  final List<Station> _stations = [];
   List<Station> get stations {
     return [..._stations];
   }
@@ -80,12 +80,12 @@ class StationService extends ChangeNotifier {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Success'),
-              content: Text('Station created successfully.'),
+              title: const Text('Success'),
+              content: const Text('Station created successfully.'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             );
@@ -95,13 +95,13 @@ class StationService extends ChangeNotifier {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Error'),
+              title: const Text('Error'),
               content: Text(
                   'Failed to create station. ${jsonDecode(response.body)['message']}'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             );
@@ -247,12 +247,12 @@ class StationService extends ChangeNotifier {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Error'),
-              content: Text('Failed to create bus'),
+              title: const Text('Error'),
+              content: const Text('Failed to create bus'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             );

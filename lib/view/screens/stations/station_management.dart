@@ -4,11 +4,12 @@ import 'package:septeo_transport/view/components/app_colors.dart';
 import '../../../model/station.dart';
 import '../../../viewmodel/station_services.dart';
 import '../../components/station_item.dart';
-import 'station_detail_screen.dart';
 import 'add_station_sheet.dart';
 
 
 class StationManagement extends StatefulWidget {
+  const StationManagement({super.key});
+
   @override
   _StationManagementState createState() => _StationManagementState();
 }
@@ -61,7 +62,7 @@ _getStationList() async {
               isScrollControlled: true,
               builder: (context) {
                 
-                return AddStationSheet();
+                return const AddStationSheet();
               },
             );
           },

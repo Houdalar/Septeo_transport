@@ -8,7 +8,7 @@ import '../screens/buses/bus_details.dart';
 class BusCard extends StatelessWidget {
   final Bus bus;
 
-  BusCard({required this.bus});
+  const BusCard({super.key, required this.bus});
 
   @override
   Widget build(BuildContext context) {

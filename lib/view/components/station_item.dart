@@ -44,15 +44,15 @@ class StationCard extends StatelessWidget {
       },
       background: Container(
         color: AppColors.secondaryLightOrange,
-        child: Align(
+        child: const Align(
+          alignment: Alignment.centerRight,
           child: Padding(
-            padding: const EdgeInsets.only(right: 20.0),
+            padding: EdgeInsets.only(right: 20.0),
             child: Icon(
               Icons.delete,
               color: Colors.white,
             ),
           ),
-          alignment: Alignment.centerRight,
         ),
       ),
       child: Card(

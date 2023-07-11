@@ -1,13 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:septeo_transport/model/bus.dart';
-import 'dart:convert' as convert;
 
-import '../model/station.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 
@@ -64,12 +60,12 @@ class BusService extends ChangeNotifier {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Success'),
-              content: Text('Bus created successfully.'),
+              title: const Text('Success'),
+              content: const Text('Bus created successfully.'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             );
@@ -79,12 +75,12 @@ class BusService extends ChangeNotifier {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Error'),
-              content: Text('Failed to create bus'),
+              title: const Text('Error'),
+              content: const Text('Failed to create bus'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             );
@@ -106,12 +102,12 @@ class BusService extends ChangeNotifier {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Error'),
-              content: Text('Failed to create bus'),
+              title: const Text('Error'),
+              content: const Text('Failed to create bus'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             );

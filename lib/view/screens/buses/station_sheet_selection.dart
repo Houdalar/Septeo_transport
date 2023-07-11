@@ -4,6 +4,8 @@ import '../../../model/station.dart';
 import '../../../viewmodel/station_services.dart';
 
 class StationSelectionScreen extends StatefulWidget {
+  const StationSelectionScreen({super.key});
+
   @override
   _StationSelectionScreenState createState() => _StationSelectionScreenState();
 }
@@ -32,10 +34,10 @@ _getStationList() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Stations'),
+        title: const Text('Select Stations'),
         actions: [
           IconButton(
-            icon: Icon(Icons.done),
+            icon: const Icon(Icons.done),
             onPressed: () {
               
               Navigator.of(context).pop(selectedStationIds);

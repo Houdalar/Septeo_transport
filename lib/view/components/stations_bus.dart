@@ -9,7 +9,7 @@ class BusItemCard extends StatelessWidget {
   final Bus? bus;
   final Function calculateTimeRemaining;
 
-  BusItemCard({
+  const BusItemCard({super.key, 
     required this.arrivalTime,
     required this.bus,
     required this.calculateTimeRemaining,
