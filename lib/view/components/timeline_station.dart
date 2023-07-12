@@ -10,42 +10,39 @@ class TimelineStation extends StatelessWidget {
   final String stationAddress;
   final bool isFirst;
   final bool isLast;
-  final List<ArrivalTime>? arrivalTimes;
+  final ArrivalTime arrivalTime;
 
   TimelineStation(
       {required this.stationName,
       required this.stationAddress,
       required this.isFirst,
       required this.isLast,
-      this.arrivalTimes});
+      required this.arrivalTime});
 
   @override
   Widget build(BuildContext context) {
-    // Calculate firstArrivalTime
-    String firstArrivalTime = "";
+     String time = "";
     bool isDone = false; // Initiate isDone variable
 
-    if (arrivalTimes != null && arrivalTimes!.isNotEmpty) {
+    if (arrivalTime != null) {
       final now = DateTime.now();
       final format = DateFormat("HH:mm"); // Define the time format
 
-      for (var arrivalTime in arrivalTimes!) {
-        try {
-          DateTime arrivalDateTime = format.parse(arrivalTime.time!);
-          arrivalDateTime = DateTime(now.year, now.month, now.day,
-              arrivalDateTime.hour, arrivalDateTime.minute);
+      try {
+        DateTime arrivalDateTime = format.parse(arrivalTime!.time!);
+        arrivalDateTime = DateTime(now.year, now.month, now.day,
+            arrivalDateTime.hour, arrivalDateTime.minute);
 
-          // If the firstArrivalTime is before or at current time, it's done
-          if (now.compareTo(arrivalDateTime) < 0) {
-            firstArrivalTime = arrivalTime.time!;
-            break;
-          } else {
-             firstArrivalTime = arrivalTime.time!;
-            isDone = true;
-          }
-        } catch (e) {
-          print("Error parsing time: $e");
+        // If the arrivalTime is before or at current time, it's done
+        if (now.isAfter(arrivalDateTime) || now.isAtSameMomentAs(arrivalDateTime)) {
+          time = arrivalTime.time!;
+          isDone = true;
+        } else {
+          time = arrivalTime.time!;
+          isDone = false;
         }
+      } catch (e) {
+        print("Error parsing time: $e");
       }
     }
 
@@ -92,7 +89,7 @@ class TimelineStation extends StatelessWidget {
         padding: const EdgeInsets.only(right: 15),
         alignment: Alignment.centerRight,
         child: Text(
-          firstArrivalTime,
+          time,
           style: TextStyle(
             color: isDone ? AppColors.primaryOrange : Colors.grey,
             fontSize: 18,

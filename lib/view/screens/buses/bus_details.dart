@@ -28,7 +28,7 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
   Future<List<Station>> fetchStations() async {
     // Call the API to fetch the stations
     List<Station> stations =
-        await StationService.fetchStations(widget.bus.stations);
+        await StationService.fetchStations(widget.bus.id);
     return stations;
   }
 
@@ -88,7 +88,9 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                     mapType: MapType.normal,
                     onMapCreated: _onMapCreated,
                     initialCameraPosition: CameraPosition(
-                      target: _center,
+                      target: LatLng(
+                          stations[0].location.lat,
+                          stations[0].location.lng),
                       zoom: 17.0,
                     ),
                     markers: markers,

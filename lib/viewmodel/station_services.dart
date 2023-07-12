@@ -18,7 +18,9 @@ void requestLocationPermission() async {
 }
 
 class StationService extends ChangeNotifier {
-  static String baseUrl = "10.0.2.2:8080";
+  static String baseUrl = "10.0.2.2:8080"; // for anfroid emulator
+  //static String baseUrl = "192.168.250.41:8080"; // for real device
+
 
   final String key = 'AIzaSyADG1lENsRv14KlWdZgXOuMfcl_lf0MaXA';
   static const String apiKey =
@@ -32,17 +34,16 @@ class StationService extends ChangeNotifier {
   StationService();
 
   static Future<List<Station>> fetchStations(
-    List<String> ids,
+    String busId,
   ) async {
-    final response = await http.post(
-      Uri.parse('http://$baseUrl/station/buses'),
+    final response = await http.get(
+      Uri.parse('http://$baseUrl/station/buses/$busId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(<String, dynamic>{
-        'ids': ids,
-      }),
+     
     );
+   
 
     if (response.statusCode == 200) {
       var stationList = json.decode(response.body) as List;
