@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../model/station.dart';
-import '../screens/stations/station_detail_screen.dart';
+import '../screens/admin/stations/station_detail_screen.dart';
 import '../../viewmodel/station_services.dart';
 import 'app_colors.dart';
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:septeo_transport/view/screens/buses/station_sheet_selection.dart';
+import 'package:septeo_transport/view/screens/admin/buses/station_sheet_selection.dart';
 import 'package:septeo_transport/viewmodel/station_services.dart';
 
-import '../../../model/user.dart';
-import '../../../viewmodel/bus_services.dart';
-import '../../../viewmodel/user_services.dart';
-import '../../components/app_colors.dart';
+import '../../../../model/user.dart';
+import '../../../../viewmodel/bus_services.dart';
+import '../../../../viewmodel/user_services.dart';
+import '../../../components/app_colors.dart';
 
 class AddBusSheet extends StatefulWidget {
   const AddBusSheet({super.key});

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 
-import 'view/screens/user/home_page.dart';
+import 'view/screens/admin/user/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {

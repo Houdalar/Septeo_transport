@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/model/station.dart';
-import '../../components/timeline_station.dart';
+import '../../../components/timeline_station.dart';
 
 class StationsTab extends StatelessWidget {
   final List<Station> stations;

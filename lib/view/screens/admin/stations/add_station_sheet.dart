@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/viewmodel/station_services.dart';
 
-import '../../../model/station.dart';
-import '../../components/app_colors.dart';
+import '../../../../model/station.dart';
+import '../../../components/app_colors.dart';
 import 'package:place_picker/place_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 

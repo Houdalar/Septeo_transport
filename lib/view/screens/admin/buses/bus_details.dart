@@ -3,8 +3,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:septeo_transport/model/bus.dart';
 import 'package:septeo_transport/model/station.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
-import '../../../viewmodel/station_services.dart';
-import '../../components/timeline_station.dart';
+import '../../../../viewmodel/station_services.dart';
+import '../../../components/timeline_station.dart';
 import 'details_tab.dart';
 import 'stations_tab.dart';
 

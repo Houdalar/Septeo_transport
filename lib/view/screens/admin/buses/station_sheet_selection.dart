@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../model/station.dart';
-import '../../../viewmodel/station_services.dart';
+import '../../../../model/station.dart';
+import '../../../../viewmodel/station_services.dart';
 
 class StationSelectionScreen extends StatefulWidget {
   const StationSelectionScreen({super.key});

@@ -3,7 +3,7 @@ import 'package:septeo_transport/view/components/app_colors.dart';
 
 import '../../model/bus.dart';
 import '../../viewmodel/bus_services.dart';
-import '../screens/buses/bus_details.dart';
+import '../screens/admin/buses/bus_details.dart';
 
 class BusCard extends StatelessWidget {
   final Bus bus;

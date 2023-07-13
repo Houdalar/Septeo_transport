@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../components/app_colors.dart';
+import '../../../components/app_colors.dart';
 import 'admin_screen.dart';
 import 'home_screen.dart';
 

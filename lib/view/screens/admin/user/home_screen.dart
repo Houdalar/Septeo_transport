@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/model/bus.dart';
 
-import '../../../model/planning.dart';
-import '../../../model/station.dart';
-import '../../components/search_bar.dart';
-import '../../components/station_card.dart';
-import '../../components/today_card.dart';
+import '../../../../model/planning.dart';
+import '../../../../model/station.dart';
+import '../../../components/search_bar.dart';
+import '../../../components/station_card.dart';
+import '../../../components/today_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

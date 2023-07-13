@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/model/bus.dart';
-import '../../../model/station.dart';
-import '../../../viewmodel/bus_services.dart';
-import '../../components/app_colors.dart';
+import '../../../../model/station.dart';
+import '../../../../viewmodel/bus_services.dart';
+import '../../../components/app_colors.dart';
 import 'station_sheet_selection.dart';
 
 class BusDetailsTab extends StatefulWidget {
