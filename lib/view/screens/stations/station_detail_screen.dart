@@ -56,31 +56,19 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
     super.initState();
     _getAndSetDirections();
   }
-
-  void _getAndSetDirections() async {
-    Map<String, dynamic> directions = await stationService.getDirections(
-      '${widget.station.location.lat},${widget.station.location.lng}',
-      '36.84790,10.26857',
-    );
-
-    print('Directions: $directions');
-
-    setState(() {
-      _setPolyline(directions['polyline_decoded']);
-    });
-  }
-  /*void _getAndSetDirections() async {
+void _getAndSetDirections() async {
   List<LatLng> directions = await stationService.getOpenRouteCoordinates(
-    LatLng(widget.station.location.lat, widget.station.location.lng) as String,
-    const LatLng(36.84790,10.26857) as String,
+    LatLng(widget.station.location.lat, widget.station.location.lng),
+    LatLng(36.84790,10.26857),
+    
   );
 
   print('Directions: $directions');
 
   setState(() {
-    _setPolyline(directions.cast<PointLatLng>());
+    _setPolyline(directions);
   });
-}*/
+}
 
   void _setPolygon() {
     final String polygonIdVal = 'polygon_$_polygonIdCounter';
@@ -96,23 +84,19 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
     );
   }
 
-  void _setPolyline(List<PointLatLng> points) {
-    final String polylineIdVal = 'polyline_$_polylineIdCounter';
-    _polylineIdCounter++;
+  void _setPolyline(List<LatLng> points) {
+  final String polylineIdVal = 'polyline_$_polylineIdCounter';
+  _polylineIdCounter++;
 
-    _polylines.add(
-      Polyline(
-        polylineId: PolylineId(polylineIdVal),
-        width: 2,
-        color: Colors.blue,
-        points: points
-            .map(
-              (point) => LatLng(point.latitude, point.longitude),
-            )
-            .toList(),
-      ),
-    );
-  }
+  _polylines.add(
+    Polyline(
+      polylineId: PolylineId(polylineIdVal),
+      width: 2,
+      color: Colors.blue,
+      points: points,
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {

@@ -52,7 +52,6 @@ class _AddBusSheetState extends State<AddBusSheet> {
       
       int.tryParse(_CapacityController.text) ?? 0,
       _busNumberController.text,
-      selectedStationIds,
       context,
     );
   }
@@ -112,72 +111,6 @@ class _AddBusSheetState extends State<AddBusSheet> {
         return null;
       },
     );
-
-   /* final driverField = TextFormField(
-      controller: _driverController,
-      decoration: InputDecoration(
-        hintText: 'Driver id',
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: AppColors.primaryOrange),
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        filled: true,
-        fillColor: AppColors.auxiliaryOffWhite,
-        prefixIcon: const Icon(
-          Icons.location_on,
-          color: AppColors.auxiliaryGrey,
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please pick driver';
-        }
-        return null;
-      },
-    );*/
-    /*final driverField = DropdownButtonFormField<String>(
-      value: _selectedDriver,
-      decoration: InputDecoration(
-        hintText: 'pick a driver',
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: AppColors.primaryOrange),
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        filled: true,
-        fillColor: AppColors.auxiliaryOffWhite,
-        prefixIcon: const Icon(
-          Icons.person_outlined,
-          color: AppColors.auxiliaryGrey,
-        ),
-      ),
-      items: _drivers.map((User driver) {
-        return DropdownMenuItem<String>(
-          value: driver.id,
-          child: Text(driver.username), 
-        );
-      }).toList(),
-      onChanged: (String? newValue) {
-        setState(() {
-          _selectedDriver = newValue;
-        });
-      },
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please pick a driver';
-        }
-        return null;
-      },
-    );*/
-
-
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Center(
@@ -191,8 +124,8 @@ class _AddBusSheetState extends State<AddBusSheet> {
               busNumberField,
               const SizedBox(height: 20),
              // driverField,
-              const SizedBox(height: 20),
-              TextButton(
+              const SizedBox(height: 30),
+             /* TextButton(
                 onPressed: () async {
                   // Navigate to the StationSelectionScreen and wait for the result, which should be a list of selected station ids.
                   final List<String>? result =
@@ -215,8 +148,8 @@ class _AddBusSheetState extends State<AddBusSheet> {
                   style:
                       TextStyle(color: AppColors.primaryOrange, fontSize: 18),
                 ),
-              ),
-              const SizedBox(height: 20),
+              ),*/
+              //const SizedBox(height: 20),
               SizedBox(
                 height: 50.0,
                 width: double.infinity * 0.8,

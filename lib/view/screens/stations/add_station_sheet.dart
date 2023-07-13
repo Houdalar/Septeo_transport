@@ -17,7 +17,7 @@ class _AddStationSheetState extends State<AddStationSheet> {
   final _formKey = GlobalKey<FormState>();
   final _stationNameController = TextEditingController();
   final _stationAddressController = TextEditingController();
-  //final _stationLocationController = TextEditingController();
+  final _stationLocationController = TextEditingController();
   final _latController = TextEditingController();
   final _lngController = TextEditingController();
   final StationService stationService = StationService();
@@ -28,7 +28,7 @@ class _AddStationSheetState extends State<AddStationSheet> {
   void dispose() {
     _stationNameController.dispose();
     _stationAddressController.dispose();
-    //_stationLocationController.dispose();
+    _stationLocationController.dispose();
     _latController.dispose();
     _lngController.dispose();
     super.dispose();
@@ -48,7 +48,7 @@ class _AddStationSheetState extends State<AddStationSheet> {
       LocationResult? result = await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => PlacePicker(
-            "AIzaSyADG1lENsRv14KlWdZgXOuMfcl_lf0MaXA",
+            "2922eb17-0b68-43d8-bd67-36046c2fa94e",
             displayLocation: const LatLng(36.84790, 10.26857),
             defaultLocation: const LatLng(36.84790, 10.26857),
           ),
@@ -56,7 +56,7 @@ class _AddStationSheetState extends State<AddStationSheet> {
       );
 
       if (result != null) {
-        //  _stationLocationController.text = result.formattedAddress ?? '';
+        _stationLocationController.text = result.formattedAddress ?? '';
         pickedLatitude = result.latLng?.latitude;
         pickedLongitude = result.latLng?.longitude;
       } else {
@@ -75,14 +75,14 @@ class _AddStationSheetState extends State<AddStationSheet> {
       name: _stationNameController.text,
       address: _stationAddressController.text,
       location: Location(
-       //lat: pickedLatitude!,
-       // lng: pickedLongitude!,
-        lat: double.parse(_latController.text),
-        lng: double.parse(_lngController.text),
+        lat: pickedLatitude!,
+        lng: pickedLongitude!,
+        //lat: double.parse(_latController.text),
+        //lng: double.parse(_lngController.text),
       ),
       arrivalTimes: [],
     );
-    await stationService.createStation(station , context);
+    await stationService.createStation(station, context);
   }
 
   @override
@@ -141,7 +141,7 @@ class _AddStationSheetState extends State<AddStationSheet> {
       },
     );
 
-    /*final locationField = TextFormField(
+    final locationField = TextFormField(
       controller: _stationLocationController,
       decoration: InputDecoration(
         hintText: ' location : lat, lng',
@@ -166,7 +166,7 @@ class _AddStationSheetState extends State<AddStationSheet> {
         }
         return null;
       },
-    );*/
+    );
     final latField = TextFormField(
       controller: _latController,
       decoration: InputDecoration(
@@ -231,6 +231,8 @@ class _AddStationSheetState extends State<AddStationSheet> {
             const SizedBox(height: 30),
             stationAddressField,
             const SizedBox(height: 20),
+            locationField,
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -247,8 +249,7 @@ class _AddStationSheetState extends State<AddStationSheet> {
               },
               child: const Text(
                 'Pick location from map',
-                style:
-                    TextStyle(color: AppColors.primaryOrange, fontSize: 18),
+                style: TextStyle(color: AppColors.primaryOrange, fontSize: 18),
               ),
             ),
             const SizedBox(height: 20),
@@ -274,7 +275,7 @@ class _AddStationSheetState extends State<AddStationSheet> {
                 ),
               ),
             ),
-             SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+            SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
           ],
         ),
       ),

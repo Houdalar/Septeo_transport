@@ -20,6 +20,7 @@ class BusDetailsScreen extends StatefulWidget {
 class _BusDetailsScreenState extends State<BusDetailsScreen> {
   late GoogleMapController mapController;
   final LatLng _center = const LatLng(36.84790, 10.26857);
+  final StationService stationService = StationService();
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -27,8 +28,7 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
 
   Future<List<Station>> fetchStations() async {
     // Call the API to fetch the stations
-    List<Station> stations =
-        await StationService.fetchStations(widget.bus.id);
+    List<Station> stations = await StationService.fetchStations(widget.bus.id);
     return stations;
   }
 
@@ -45,25 +45,28 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
     }).toSet();
   }
 
-  Set<Polyline> createPolylines(List<Station> stations) {
-    PolylineId id = const PolylineId('poly');
+Future<Set<Polyline>> createPolylines(List<Station> stations) async {
+  PolylineId id = const PolylineId('poly');
+  
+  List<LatLng> polylineCoordinates = [];
 
-    List<LatLng> polylineCoordinates = [];
-    for (var station in stations) {
-      polylineCoordinates
-          .add(LatLng(station.location.lat, station.location.lng));
-    }
-
-    Polyline polyline = Polyline(
-      polylineId: id,
-      color: Colors.red,
-      points: polylineCoordinates,
-      width: 3,
+  for (var i = 0; i < stations.length - 1; i++) {
+    List<LatLng> route = await stationService.getOpenRouteCoordinates(
+      LatLng(stations[i].location.lat, stations[i].location.lng),
+      LatLng(stations[i + 1].location.lat, stations[i + 1].location.lng)
     );
-
-    return {polyline};
+    polylineCoordinates.addAll(route);
   }
 
+  Polyline polyline = Polyline(
+    polylineId: id,
+    color: Colors.blue,
+    points: polylineCoordinates,
+    width: 2,
+  );
+
+  return {polyline};
+}
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -81,21 +84,38 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                 } else {
                   List<Station> stations = snapshot.data!;
                   Set<Marker> markers = createMarkers(stations);
-                  Set<Polyline> polylines = createPolylines(stations);
 
-                  return GoogleMap(
-                    cameraTargetBounds: CameraTargetBounds.unbounded,
-                    mapType: MapType.normal,
-                    onMapCreated: _onMapCreated,
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(
-                          stations[0].location.lat,
-                          stations[0].location.lng),
-                      zoom: 17.0,
-                    ),
-                    markers: markers,
-                    polylines: polylines,
-                  );
+                  return FutureBuilder<Set<Polyline>>(
+                      future: createPolylines(stations),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<Set<Polyline>> polylineSnapshot) {
+                        if (polylineSnapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (polylineSnapshot.hasError) {
+                          return Text('Error: ${polylineSnapshot.error}');
+                        } else {
+                          Set<Polyline> polylines = polylineSnapshot.data!;
+
+                          return GoogleMap(
+                            cameraTargetBounds: CameraTargetBounds.unbounded,
+                            mapType: MapType.normal,
+                            onMapCreated: _onMapCreated,
+                            initialCameraPosition: CameraPosition(
+                              target: LatLng(
+                                  stations.isNotEmpty
+                                      ? stations[0].location.lat
+                                      : _center.latitude,
+                                  stations.isNotEmpty
+                                      ? stations[0].location.lng
+                                      : _center.longitude),
+                              zoom: 13.0,
+                            ),
+                            markers: markers,
+                            polylines: polylines,
+                          );
+                        }
+                      });
                 }
               },
             ),

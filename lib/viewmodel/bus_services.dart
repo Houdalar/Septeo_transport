@@ -40,8 +40,7 @@ class BusService extends ChangeNotifier {
     }
   }
 
-  Future<void> createNewBus(int capacity, String busNumber,
-      List<String> stations, BuildContext context) async {
+  Future<void> createNewBus(int capacity, String busNumber,BuildContext context) async {
     final response = await http.post(
       Uri.parse('http://$baseUrl/bus'),
       headers: <String, String>{
@@ -50,10 +49,8 @@ class BusService extends ChangeNotifier {
       body: jsonEncode(<String, dynamic>{
         'capacity': capacity,
         'busNumber': busNumber,
-        'stations': stations,
       }),
     );
-    print(response.statusCode);
 
     if (response.statusCode == 201) {
       Navigator.pop(context);
@@ -115,4 +112,24 @@ class BusService extends ChangeNotifier {
           });
     }
   }
+
+   static Future<bool> updateBus(String busId , int capacity , String busNumber)async {
+    final response = await http.put(
+      Uri.parse('http://$baseUrl/bus/$busId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'capacity': capacity,
+        'busNumber': busNumber,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return true;
+    }
+    
+    return false;
+  }
+
 }

@@ -213,26 +213,33 @@ class StationService extends ChangeNotifier {
   }
 //return results ;
 
-  Future<List<LatLng>> getOpenRouteCoordinates(
-      String startPoint, String endPoint) async {
-    // Requesting for openrouteservice api
-    var response = await http.get(getRouteUrl(startPoint, endPoint) as Uri);
+Future<List<LatLng>> getOpenRouteCoordinates(LatLng startPoint, LatLng endPoint) async {
+  var response = await http.get(getGraphHopperRouteUrl(startPoint, endPoint));
 
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      List listOfPoints = data['features'][0]['geometry']['coordinates'];
-      List<LatLng> points = listOfPoints
-          .map((p) => LatLng(p[1].toDouble(), p[0].toDouble()))
-          .toList();
-      return points;
-    } else {
-      throw Exception('Failed to load coordinates');
-    }
-  }
+  print(response.body);
 
-  String getRouteUrl(String startPoint, String endPoint) {
-    return '$baseUrl?api_key=$apiKey&start=$startPoint&end=$endPoint';
+if (response.statusCode == 200) {
+    var data = jsonDecode(response.body);
+    String encodedPolyline = data['paths'][0]['points'];
+    List<LatLng> points = decodePolyline(encodedPolyline);
+    return points;
+  } else {
+    throw Exception('Failed to load coordinates');
   }
+}
+
+/*Uri getRouteUrl(LatLng startPoint, LatLng endPoint) {
+  return Uri.parse('https://www.openstreetmap.org/directions?api_key=$apiKey&start=${startPoint.latitude},${startPoint.longitude}&end=${endPoint.latitude},${endPoint.longitude}');
+}*/
+Uri getGraphHopperRouteUrl(LatLng startPoint, LatLng endPoint) {
+  return Uri.parse('https://graphhopper.com/api/1/route?point=${startPoint.latitude},${startPoint.longitude}&point=${endPoint.latitude},${endPoint.longitude}&vehicle=car&locale=en&key=2922eb17-0b68-43d8-bd67-36046c2fa94e');
+}
+
+List<LatLng> decodePolyline(String encoded) {
+ var decodedPoints = PolylinePoints().decodePolyline(encoded);
+  List<LatLng> points = decodedPoints.map((p) => LatLng(p.latitude, p.longitude)).toList();
+  return points;
+}
 
   void deleteStation(String id, BuildContext context) async {
     final response = await http.delete(

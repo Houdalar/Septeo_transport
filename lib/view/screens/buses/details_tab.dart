@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/model/bus.dart';
 import '../../../model/station.dart';
+import '../../../viewmodel/bus_services.dart';
 import '../../components/app_colors.dart';
 import 'station_sheet_selection.dart';
 
@@ -70,11 +71,13 @@ class _BusDetailsTabState extends State<BusDetailsTab> {
             else
               Column(
                 children: [
-                  Text(' bus number  ${widget.bus.busNumber}' , style: TextStyle(fontSize: 20),),
+                  Text(
+                    ' bus number  ${widget.bus.busNumber}',
+                    style: const TextStyle(fontSize: 20),
+                  ),
                   const SizedBox(height: 20),
                 ],
               ),
-
             if (_isEditing)
               Column(
                 children: [
@@ -102,30 +105,32 @@ class _BusDetailsTabState extends State<BusDetailsTab> {
             else
               Column(
                 children: [
-                  Text('  capacity    ${widget.bus.capacity}' , style: TextStyle(fontSize: 20)),
+                  Text('  capacity    ${widget.bus.capacity}',
+                      style: const TextStyle(fontSize: 20)),
                   const SizedBox(height: 15),
                 ],
               ),
-              if (_isEditing)
-            TextButton(
-              onPressed: () async {
-                List<String> selectedStationIds = await Navigator.push(
+            if (_isEditing)
+              TextButton(
+                onPressed: () async {
+                  /* List<String> selectedStationIds = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const StationSelectionScreen(),
                   ),
-                ) as List<String>;
-
-                // TODO: Update the bus's stations here using selectedStationIds...
-              },
-              child: const Text(
-                "edit stations",
-                style: TextStyle(
-                  color: AppColors.primaryOrange,
-                  fontSize: 18,
+                ) as List<String>;*/
+                  setState(() {
+                    _isEditing = false;
+                  });
+                },
+                child: const Text(
+                  "cancel",
+                  style: TextStyle(
+                    color: AppColors.primaryOrange,
+                    fontSize: 18,
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 15),
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.9,
@@ -146,12 +151,16 @@ class _BusDetailsTabState extends State<BusDetailsTab> {
                 ),
                 onPressed: () async {
                   if (_isEditing) {
-                    // TODO: Save changes here...
-                    // You can get the updated values from the controllers like so:
                     String updatedBusNumber = _busNumberController.text;
-                    String updatedCapacity = _capacityController.text;
+                    int updatedCapacity = int.parse(_capacityController.text);
+                    bool isSuccess = await BusService.updateBus(
+                        widget.bus.id, updatedCapacity, updatedBusNumber);
+                    setState(() {
+                      _isEditing = false;
+                      widget.bus.busNumber = updatedBusNumber;
+                      widget.bus.capacity = updatedCapacity;
+                    });
                   } else {
-                    // When Edit button is pressed, change isEditing to true to show the form fields.
                     setState(() {
                       _isEditing = true;
                     });
