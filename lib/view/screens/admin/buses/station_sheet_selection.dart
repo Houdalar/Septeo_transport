@@ -24,7 +24,7 @@ class _StationSelectionScreenState extends State<StationSelectionScreen> {
   }
 // get the list of stations from the server
 _getStationList() async {
-    var stations = await StationService().getStations();
+    var stations = await StationService.getStations();
     setState(() {
       allStations = stations;
     });

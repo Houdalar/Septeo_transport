@@ -10,8 +10,9 @@ import 'stations_tab.dart';
 
 class BusDetailsScreen extends StatefulWidget {
   final Bus bus;
+  final bool isdriver;
 
-  const BusDetailsScreen({super.key, required this.bus});
+  const BusDetailsScreen({super.key, required this.bus, required this.isdriver});
 
   @override
   _BusDetailsScreenState createState() => _BusDetailsScreenState();
@@ -194,7 +195,7 @@ Future<Set<Polyline>> createPolylines(List<Station> stations) async {
                   StationsTab(
                       stations: stations, scrollController: scrollController),
                   BusDetailsTab(
-                      scrollController: scrollController, bus: widget.bus),
+                      scrollController: scrollController, bus: widget.bus , isdriver: widget.isdriver,),
                 ],
               ),
             ),

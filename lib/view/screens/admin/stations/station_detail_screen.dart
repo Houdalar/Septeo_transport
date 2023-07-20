@@ -63,7 +63,7 @@ void _getAndSetDirections() async {
     
   );
 
-  print('Directions: $directions');
+ 
 
   setState(() {
     _setPolyline(directions);

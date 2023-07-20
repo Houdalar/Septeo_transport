@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../components/app_colors.dart';
+import '../../employee/employee_space.dart';
+import '../buses/bus_management.dart';
 import 'admin_screen.dart';
 import 'home_screen.dart';
-
+import 'settings_page.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  final String role;
+  const Home({super.key, required this.role});
 
   @override
   HomeState createState() => HomeState();
@@ -15,6 +18,50 @@ class Home extends StatefulWidget {
 
 class HomeState extends State<Home> {
   var currentIndex = 0;
+
+  void initState() {
+    super.initState();
+
+    if (widget.role == "Admin") {
+      listOfIcons = [
+        Icons.home_rounded,
+        Icons.admin_panel_settings,
+        Icons.settings_rounded,
+      ];
+
+      listOfStrings = [
+        'Home',
+        'Admin',
+        'Settings',
+      ];
+    } else if (widget.role == "Driver") {
+      listOfIcons = [
+        Icons.directions_bus,
+        Icons.settings_rounded,
+      ];
+
+      listOfStrings = [
+        'driver',
+        'Settings',
+      ];
+    }else {
+      listOfIcons = [
+        Icons.home_rounded,
+        Icons.work_outline,
+        Icons.settings_rounded,
+      ];
+
+      listOfStrings = [
+        'Home',
+        'Employee',
+        'Settings',
+      ];
+    }
+  }
+
+   List<IconData> listOfIcons = [];
+
+  List<String> listOfStrings = [];
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +82,9 @@ class HomeState extends State<Home> {
           borderRadius: BorderRadius.circular(50),
         ),
         child: ListView.builder(
-          itemCount: 3,
+          itemCount:widget.role == "Driver"? 2: 3,
           scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.symmetric(horizontal: displayWidth * .02),
+          padding: EdgeInsets.symmetric(horizontal: displayWidth * .02) ,
           itemBuilder: (context, index) => InkWell(
             onTap: () {
               setState(() {
@@ -48,7 +95,9 @@ class HomeState extends State<Home> {
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: displayWidth * .03),
+              padding:  widget.role == "Driver"?EdgeInsets.symmetric(horizontal: displayWidth * .1)
+              : EdgeInsets.symmetric(horizontal: displayWidth * .03)
+              ,
               child: Stack(
                 children: [
                   AnimatedContainer(
@@ -85,8 +134,9 @@ class HomeState extends State<Home> {
                             AnimatedContainer(
                               duration: const Duration(seconds: 1),
                               curve: Curves.fastLinearToSlowEaseIn,
-                              width:
-                                  index == currentIndex ? displayWidth * .13 : 0,
+                              width: index == currentIndex
+                                  ? displayWidth * .13
+                                  : 0,
                             ),
                             AnimatedOpacity(
                               opacity: index == currentIndex ? 1 : 0,
@@ -110,8 +160,9 @@ class HomeState extends State<Home> {
                             AnimatedContainer(
                               duration: const Duration(seconds: 1),
                               curve: Curves.fastLinearToSlowEaseIn,
-                              width:
-                                  index == currentIndex ? displayWidth * .03 : 20,
+                              width: index == currentIndex
+                                  ? displayWidth * .03
+                                  : 20,
                             ),
                             Icon(
                               listOfIcons[index],
@@ -133,41 +184,19 @@ class HomeState extends State<Home> {
       ),
       body: IndexedStack(
         index: currentIndex,
-        children: const [
-          HomePage(),
-          AdminSpace(),
-          SettingsPage(),
-        ],
+        children: widget.role == "Driver"
+            ? [const BusManagement( isdriver: true,), const SettingsPage()]
+            : widget.role == "Admin"
+                ? [const HomePage(), const AdminSpace(), const SettingsPage()]
+                : [const HomePage(), const EmployeeSpace(), const SettingsPage()],
       ),
     );
   }
 
-  List<IconData> listOfIcons = [
-    Icons.home_rounded,
-    Icons.admin_panel_settings,
-    Icons.settings_rounded,
-  ];
-
-  List<String> listOfStrings = [
-    'Home',
-    'Admin',
-    'Settings',
-  ];
 }
 
 
 
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Welcome to the Settings!',
-        style: TextStyle(fontSize: 24),
-      ),
-    );
-  }
-}
+

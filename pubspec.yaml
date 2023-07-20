@@ -50,6 +50,7 @@ dependencies:
   timeline_tile: ^2.0.0
   timelines: ^0.1.0
   intl: ^0.18.1
+  flutter_settings_screens: ^0.3.3-null-safety+2
   
   
 

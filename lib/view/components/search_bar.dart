@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 
 class Search_bar extends StatelessWidget {
-  const Search_bar({super.key});
+  final ValueChanged<String> onChanged;
+  const Search_bar({Key? key, required this.onChanged}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +15,7 @@ class Search_bar extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 0),
       child: TextField(
+         onChanged: onChanged,
         decoration: InputDecoration(
           hintText: 'Search...',
           border: OutlineInputBorder(

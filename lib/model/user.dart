@@ -4,13 +4,16 @@ class User {
   String password;
   String username;
   Role role;
-  List<String> weeklyPlanning;
 
-  User({required this.id, required this.email, required this.password, required this.username, required this.role, required this.weeklyPlanning});
+  User({
+    required this.id,
+    required this.email,
+    required this.password,
+    required this.username,
+    required this.role,
+  });
 
   factory User.fromJson(Map<String, dynamic> json) {
-    var list = json['weeklyPlanning'] as List;
-    List<String> weeklyPlanningList = list.map((i) => i.toString()).toList();
     Role role;
 
     switch (json['role']) {
@@ -33,8 +36,9 @@ class User {
       password: json['password'],
       username: json['username'],
       role: role,
-      weeklyPlanning: weeklyPlanningList,
+      
     );
   }
 }
+
 enum Role { Admin, Employee, Driver }

@@ -19,7 +19,7 @@ class _AdminSpaceState extends State<AdminSpace> {
       child: Scaffold(
         body: Stack(
           children: [
-            _selectedIndex == 0 ? const StationManagement() : const BusManagement(),
+            _selectedIndex == 0 ? const StationManagement() : const BusManagement( isdriver: false,),
             Positioned(
               top: 10.0,
               left: 30,

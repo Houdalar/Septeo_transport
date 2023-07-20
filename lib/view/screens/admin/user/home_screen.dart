@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/model/bus.dart';
+import 'package:septeo_transport/view/components/app_colors.dart';
 
 import '../../../../model/planning.dart';
 import '../../../../model/station.dart';
+import '../../../../viewmodel/station_services.dart';
+import '../../../../viewmodel/user_services.dart';
 import '../../../components/search_bar.dart';
 import '../../../components/station_card.dart';
 import '../../../components/today_card.dart';
@@ -15,203 +18,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<Station> availableStations = [
-    Station(
-      id: "1",
-      name: "lac 2",
-      address: "123 Street, City A",
-      location: Location(lat: 36.84790, lng: 10.26857),
-      arrivalTimes: [
-        ArrivalTime(
-          time: "15:00",
-          bus: Bus(
-            id: "1",
-           
-            
-            capacity: 50,
-            // startDate: DateTime.now(),
-            busNumber: "B25",
-          ),
-        ),
-        ArrivalTime(
-          time: "14:15",
-          bus: Bus(
-            id: "2",
-           
-            
-            capacity: 60,
-            // startDate: DateTime.now(),
-            busNumber: "B26",
-          ),
-        ),
-        ArrivalTime(
-          time: "14:25",
-          bus: Bus(
-            id: "2",
-          
-            
-            capacity: 60,
-            // startDate: DateTime.now(),
-            busNumber: "B26",
-          ),
-        ),
-      ],
-    ),
-    Station(
-      id: "1",
-      name: "ariana",
-      address: "123 Street, City A",
-      location: Location(lat: 36.88988, lng: 10.17240),
-      arrivalTimes: [
-        ArrivalTime(
-          time: "14:00",
-          bus: Bus(
-            id: "1",
-           
-            
-            capacity: 50,
-            // startDate: DateTime.now(),
-            busNumber: "B25",
-          ),
-        ),
-        ArrivalTime(
-          time: "14:08",
-          bus: Bus(
-            id: "1",
-            
-            capacity: 50,
-            // startDate: DateTime.now(),
-            busNumber: "B25",
-          ),
-        ),
-        ArrivalTime(
-          time: "16:20",
-          bus: Bus(
-            id: "1",
-           
-           
-            capacity: 50,
-            // startDate: DateTime.now(),
-            busNumber: "B25",
-          ),
-        ),
-        ArrivalTime(
-          time: "17:15",
-          bus: Bus(
-            id: "2",
-           
-            
-            capacity: 60,
-            // startDate: DateTime.now(),
-            busNumber: "B26",
-          ),
-        ),
-      ],
-    ),
-    Station(
-      id: "2",
-      name: "mohammedia",
-      address: "456 Avenue, City B",
-      location: Location(lat: 36.67933, lng: 10.15657),
-      arrivalTimes: [
-        ArrivalTime(
-          time: "17:30:00",
-          bus: Bus(
-            id: "3",
-           
-           
-            capacity: 55,
-            //startDate: DateTime.now(),
-            busNumber: "B27",
-          ),
-        ),
-        ArrivalTime(
-          time: "18:00:00",
-          bus: Bus(
-            id: "4",
-           
-            
-            capacity: 65,
-            // startDate: DateTime.now(),
-            busNumber: "B28",
-          ),
-        ),
-      ],
-    ),
-  ];
-
-  final Planning todayPlanning = Planning(
-      id: "1",
-      user: "user",
-      dayOfWeek: "Monday",
-      isTakingBus: true,
-      toStation: Station(
-        id: "1",
-        name: "lac 2",
-        address: "123 Street, City",
-        location: Location(lat: 51.5074, lng: 0.1278),
-        arrivalTimes: [
-          ArrivalTime(
-            time: "13:30",
-            bus: Bus(
-              id: "3",
-              
-             
-              capacity: 55,
-              // startDate: DateTime.now(),
-              busNumber: "B27",
-            ),
-          ),
-          ArrivalTime(
-            time: "14:15",
-            bus: Bus(
-              id: "4",
-              
-              
-              capacity: 65,
-//startDate: DateTime.now(),
-              busNumber: "B28",
-            ),
-          ),
-        ],
-      ),
-      fromStation: Station(
-        id: "1",
-        name: "ariana",
-        address: "123 Street, City",
-        location: Location(lat: 51.5074, lng: 0.1278),
-        arrivalTimes: [
-          ArrivalTime(
-            time: "13:30:00",
-            bus: Bus(
-              id: "3",
-             
-              
-              capacity: 55,
-              //   startDate: DateTime.now(),
-              busNumber: "B27",
-            ),
-          ),
-          ArrivalTime(
-            time: "14:15:00",
-            bus: Bus(
-              id: "4",
-              
-              
-              capacity: 65,
-              //  startDate: DateTime.now(),
-              busNumber: "B28",
-            ),
-          ),
-        ],
-      ),
-      bus: Bus(
-        id: "",
-       
-        capacity: 50,
-        busNumber: "B25",
-      ),
-      time: "06:30");
+  List<Station>? _stations;
+  String _searchText = '';
+  String id = "64abf65cc2ce4294ccd8ae28";
 
   @override
   Widget build(BuildContext context) {
@@ -224,47 +33,89 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                 Row(
+                Row(
                   children: [
                     Image.asset(
                       'assets/logo.png',
-                      height:30,
+                      height: 30,
                     ),
                     const SizedBox(width: 10),
                     const Text(
                       'Transport',
-                      style: TextStyle(fontSize:30),
+                      style: TextStyle(fontSize: 30),
                     ),
-                    
                   ],
                 ),
                 const SizedBox(height: 20),
-                const Search_bar(),
+                Search_bar(onChanged: (value) {
+                  setState(() {
+                    _searchText = value;
+                  });
+                }),
                 const SizedBox(height: 40),
-                const Text("Today", style: TextStyle(fontSize: 20 )),
+                const Text("Today", style: TextStyle(fontSize: 20)),
                 const SizedBox(height: 20),
-                SizedBox(
-                    height: 100,
-                    child: PlanningCard(todayPlanning: todayPlanning)),
+                FutureBuilder<Planning?>(
+                  future: UserViewModel.getTodayPlanning(id),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<Planning?> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (snapshot.hasData) {
+                      if (snapshot.data == null) {
+                        return const Center(
+                            child: Text('No planning for today'));
+                      } else {
+                        return PlanningCard(planning: snapshot.data!);
+                      }
+                    } else {
+                      return const Center(
+                          child: Text(
+                        'No planning for today yet',
+                        style: TextStyle(color: AppColors.auxiliaryGrey),
+                      ));
+                    }
+                  },
+                ),
                 const SizedBox(height: 30),
                 const Text("Available stations",
                     style: TextStyle(fontSize: 20)),
                 const SizedBox(height: 20),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height /
-                      2.2, // Define your height here
-                  child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1 / 1,
-                    ),
-                    physics: const NeverScrollableScrollPhysics(), 
-                    itemCount: availableStations.length,
-                    itemBuilder: (BuildContext ctx, index) {
-                      return StationItem(station: availableStations[index]);
-                    },
-                  ),
+                FutureBuilder<List<Station>>(
+                  future: StationService.getStations(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Station>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else {
+                      _stations = snapshot.data!;
+                      var stationsToShow = _searchText.isEmpty
+                          ? _stations
+                          : _stations!
+                              .where((station) => station.name
+                                  .toLowerCase()
+                                  .contains(_searchText.toLowerCase()))
+                              .toList();
+
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1 / 1,
+                        ),
+                        itemCount: stationsToShow!.length,
+                        itemBuilder: (BuildContext ctx, index) {
+                          return StationItem(station: stationsToShow[index]);
+                        },
+                      );
+                    }
+                  },
                 )
               ],
             ),

@@ -24,7 +24,7 @@ class _StationManagementState extends State<StationManagement> {
   }
 // get the list of stations from the server
 _getStationList() async {
-    var stations = await StationService().getStations();
+    var stations = await StationService.getStations();
     setState(() {
       _stationList = stations;
     });
@@ -34,7 +34,7 @@ _getStationList() async {
     return SafeArea(
       child: Scaffold(
         body: FutureBuilder<List<Station>>(
-          future: StationService().getStations(),
+          future: StationService.getStations(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());

@@ -7,8 +7,9 @@ import '../screens/admin/buses/bus_details.dart';
 
 class BusCard extends StatelessWidget {
   final Bus bus;
+  final bool isdriver;
 
-  const BusCard({super.key, required this.bus});
+  const BusCard({super.key, required this.bus , required this.isdriver});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +77,7 @@ class BusCard extends StatelessWidget {
             onPressed: () {
                Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => BusDetailsScreen(bus:bus),
+                  builder: (context) => BusDetailsScreen(bus:bus , isdriver: isdriver,),
                 ),
               );
             },
