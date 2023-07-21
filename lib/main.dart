@@ -7,6 +7,7 @@ import 'view/screens/admin/user/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'view/screens/admin/user/login_screen.dart';
+import 'view/screens/appHome/app_home.dart';
 
 void main() {
   if (defaultTargetPlatform == TargetPlatform.android) {
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
         ),*/
       ),
-      initialRoute: '/home',
+      initialRoute: '/AppHome',
        onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':
@@ -63,6 +64,9 @@ class MyApp extends StatelessWidget {
           case '/home':
             //final String role = settings.arguments as String;
             return MaterialPageRoute(builder: (context) => Home(role:'Admin'));
+          case '/AppHome':
+          //final String role = settings.arguments as String;
+            return MaterialPageRoute(builder: (context) => AppHome( userType: 'Admin'));
           default:
             return null;
         }

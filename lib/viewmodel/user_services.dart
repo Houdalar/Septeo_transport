@@ -57,7 +57,7 @@ class UserViewModel extends ChangeNotifier {
         prefs.setString("Role", role.toString()); 
         prefs.setString("email", decodedToken["email"]);*/
 
-        Navigator.pushReplacementNamed(context, '/home',
+        Navigator.pushReplacementNamed(context, '/AppHome',
             arguments: decodedToken['role']);
       } else if (response.statusCode == 400) {
         showDialog(
@@ -235,7 +235,7 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
- static Future<Planning?> getTodayPlanning(String id) async {
+  static Future<Planning?> getTodayPlanning(String id) async {
   var url = Uri.parse('http://$baseUrl/todayplanning/$id');
   var response = await http.get(url);
 
@@ -248,5 +248,86 @@ class UserViewModel extends ChangeNotifier {
     throw Exception('Failed to load planning');
   }
 }
-  
+
+  static Future<List<User>> getUsers() async {
+    final response = await http.get(Uri.parse('http://$baseUrl/users'));
+    
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON.
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => User.fromJson(data)).toList();
+    } else {
+      // If the server did not return a 200 OK response, throw an exception.
+      throw Exception('Failed to load users from API');
+    }
+  }
+
+  static Future<User> getUser(String id) async {
+    final response = await http.get(Uri.parse('http://$baseUrl/user/$id'));
+    
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON.
+      return User.fromJson(json.decode(response.body));
+    } else {
+      // If the server did not return a 200 OK response, throw an exception.
+      throw Exception('Failed to load user from API');
+    }
+  }
+
+  static Future<User> createUser(String email, String password, String username, String role) async {
+    final response = await http.post(
+      Uri.parse('http://$baseUrl/user'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': email,
+        'password': password,
+        'username': username,
+        'role': role,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      // If the server returns a 201 response, parse the JSON.
+      return User.fromJson(json.decode(response.body));
+    } else {
+      // If the server did not return a 201 response, throw an exception.
+      throw Exception('Failed to create user.');
+    }
+  }
+
+  static Future<void> deleteUser(String id) async {
+    final http.Response response = await http.delete(
+      Uri.parse('http://$baseUrl/user/$id'),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete user.');
+    }
+  }
+
+  static Future<User> updateUser(String id, String email, String password, String username, String role) async {
+    final response = await http.put(
+      Uri.parse('http://$baseUrl/user/$id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String?>{
+        'email': email,
+        'password': password,
+        'username': username,
+        'role': role,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON.
+      return User.fromJson(json.decode(response.body));
+    } else {
+      // If the server did not return a 200 OK response, throw an exception.
+      throw Exception('Failed to update user.');
+    }
+  }
+
 }
