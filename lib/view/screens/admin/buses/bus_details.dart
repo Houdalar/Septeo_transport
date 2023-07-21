@@ -3,15 +3,16 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:septeo_transport/model/bus.dart';
 import 'package:septeo_transport/model/station.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
-import '../../../viewmodel/station_services.dart';
-import '../../components/timeline_station.dart';
+import '../../../../viewmodel/station_services.dart';
+import '../../../components/timeline_station.dart';
 import 'details_tab.dart';
 import 'stations_tab.dart';
 
 class BusDetailsScreen extends StatefulWidget {
   final Bus bus;
+  final bool isdriver;
 
-  const BusDetailsScreen({super.key, required this.bus});
+  const BusDetailsScreen({super.key, required this.bus, required this.isdriver});
 
   @override
   _BusDetailsScreenState createState() => _BusDetailsScreenState();
@@ -194,7 +195,7 @@ Future<Set<Polyline>> createPolylines(List<Station> stations) async {
                   StationsTab(
                       stations: stations, scrollController: scrollController),
                   BusDetailsTab(
-                      scrollController: scrollController, bus: widget.bus),
+                      scrollController: scrollController, bus: widget.bus , isdriver: widget.isdriver,),
                 ],
               ),
             ),

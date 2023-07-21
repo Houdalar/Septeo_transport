@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
-import 'package:septeo_transport/view/screens/stations/station_management.dart';
+import 'package:septeo_transport/view/screens/admin/stations/station_management.dart';
 
 import '../buses/bus_management.dart';
 
@@ -19,7 +19,7 @@ class _AdminSpaceState extends State<AdminSpace> {
       child: Scaffold(
         body: Stack(
           children: [
-            _selectedIndex == 0 ? const StationManagement() : const BusManagement(),
+            _selectedIndex == 0 ? const StationManagement() : const BusManagement( isdriver: false,),
             Positioned(
               top: 10.0,
               left: 30,

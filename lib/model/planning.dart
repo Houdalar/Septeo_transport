@@ -5,29 +5,30 @@ import 'bus.dart';
 class Planning {
     String id;
     String user;
-    String dayOfWeek;
+    String date ;
     bool isTakingBus;
     Station toStation;
     Station fromStation;
-    Bus bus;
-    String time ;
+    Bus startbus;
+    Bus finishbus;
     
   
     Planning({required this.id, required this.user, 
-    required this.dayOfWeek, required this.isTakingBus, 
+    required this.date, required this.isTakingBus, 
     required this.toStation, required this.fromStation, 
-    required this.bus, required this.time});
+    required this.startbus, required this.finishbus
+    });
   
     factory Planning.fromJson(Map<String, dynamic> json) {
       return Planning(
         id: json['_id'],
         user: json['user'],
-        dayOfWeek: json['dayOfWeek'],
+        date: json['date'],
         isTakingBus: json['isTakingBus'],
-        toStation: json['toStation'],
-        fromStation: json['fromStation'],
-        bus: Bus.fromJson(json['bus']),
-        time:json['fromStation'],
+        toStation: Station.fromJson(json['toStation']),
+        fromStation: Station.fromJson(json['fromStation']),
+        startbus: Bus.fromJson(json['startbus']),
+        finishbus: Bus.fromJson(json['finishbus']),
       );
     }
   }

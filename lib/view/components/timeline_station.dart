@@ -12,8 +12,8 @@ class TimelineStation extends StatelessWidget {
   final bool isLast;
   final ArrivalTime arrivalTime;
 
-  TimelineStation(
-      {required this.stationName,
+  const TimelineStation(
+      {super.key, required this.stationName,
       required this.stationAddress,
       required this.isFirst,
       required this.isLast,
@@ -24,26 +24,24 @@ class TimelineStation extends StatelessWidget {
      String time = "";
     bool isDone = false; // Initiate isDone variable
 
-    if (arrivalTime != null) {
-      final now = DateTime.now();
-      final format = DateFormat("HH:mm"); // Define the time format
+    final now = DateTime.now();
+    final format = DateFormat("HH:mm"); // Define the time format
 
-      try {
-        DateTime arrivalDateTime = format.parse(arrivalTime!.time!);
-        arrivalDateTime = DateTime(now.year, now.month, now.day,
-            arrivalDateTime.hour, arrivalDateTime.minute);
+    try {
+      DateTime arrivalDateTime = format.parse(arrivalTime.time!);
+      arrivalDateTime = DateTime(now.year, now.month, now.day,
+          arrivalDateTime.hour, arrivalDateTime.minute);
 
-        // If the arrivalTime is before or at current time, it's done
-        if (now.isAfter(arrivalDateTime) || now.isAtSameMomentAs(arrivalDateTime)) {
-          time = arrivalTime.time!;
-          isDone = true;
-        } else {
-          time = arrivalTime.time!;
-          isDone = false;
-        }
-      } catch (e) {
-        print("Error parsing time: $e");
+      // If the arrivalTime is before or at current time, it's done
+      if (now.isAfter(arrivalDateTime) || now.isAtSameMomentAs(arrivalDateTime)) {
+        time = arrivalTime.time!;
+        isDone = true;
+      } else {
+        time = arrivalTime.time!;
+        isDone = false;
       }
+    } catch (e) {
+      print("Error parsing time: $e");
     }
 
     // Color for indicator and line
@@ -104,7 +102,7 @@ class TimelineStation extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Text(
                 stationName,
                 style: const TextStyle(

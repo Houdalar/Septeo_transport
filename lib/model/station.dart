@@ -53,5 +53,16 @@ class ArrivalTime {
       time: json['time'],
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+    identical(this, other) ||
+    other is ArrivalTime &&
+      runtimeType == other.runtimeType &&
+      bus == other.bus &&
+      time == other.time;
+
+  @override
+  int get hashCode => bus.hashCode ^ time.hashCode;
 }
 

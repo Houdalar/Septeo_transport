@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
-import '../../../model/bus.dart';
-import '../../../model/station.dart';
-import '../../../viewmodel/station_services.dart';
-import '../../components/app_colors.dart';
-import '../../components/stations_bus.dart';
+import '../../../../model/bus.dart';
+import '../../../../model/station.dart';
+import '../../../../viewmodel/station_services.dart';
+import '../../../components/app_colors.dart';
+import '../../../components/stations_bus.dart';
 
 class StationDetailsScreen extends StatefulWidget {
   final Station station;
@@ -63,7 +63,7 @@ void _getAndSetDirections() async {
     
   );
 
-  print('Directions: $directions');
+ 
 
   setState(() {
     _setPolyline(directions);

@@ -1,31 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
-import 'package:septeo_transport/view/screens/buses/add_bus_sheet.dart';
 
-import '../../../model/bus.dart';
-import '../../../viewmodel/bus_services.dart';
-import '../../components/bus_item.dart';
+import '../../../../model/station.dart';
+import '../../../../viewmodel/station_services.dart';
+import '../../../components/station_item.dart';
+import 'add_station_sheet.dart';
 
 
-class BusManagement extends StatefulWidget {
-  const BusManagement({super.key});
+class StationManagement extends StatefulWidget {
+  const StationManagement({super.key});
 
   @override
-  _BusManagementState createState() => _BusManagementState();
+  _StationManagementState createState() => _StationManagementState();
 }
 
-class _BusManagementState extends State<BusManagement> {
+class _StationManagementState extends State<StationManagement> {
+  late List<Station> _stationList;
+
+  @override
+  void initState() {
+    super.initState();
+   //  _getStationList();
+  }
+// get the list of stations from the server
+_getStationList() async {
+    var stations = await StationService.getStations();
+    setState(() {
+      _stationList = stations;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: FutureBuilder<List<Bus>>(
-          future: BusService().getBus(),
+        body: FutureBuilder<List<Station>>(
+          future: StationService.getStations(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              print( snapshot.error);
+              print(snapshot.error);
               return const Center(child: Text('Error loading data'));
             } else {
               return Padding(
@@ -33,8 +47,8 @@ class _BusManagementState extends State<BusManagement> {
                 child: ListView.builder(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
-                    var bus = snapshot.data![index];
-                    return BusCard(bus: bus);  // You will need to define this BusCard widget
+                    var station = snapshot.data![index];
+                    return StationCard(station: station);
                   },
                 ),
               );
@@ -45,8 +59,10 @@ class _BusManagementState extends State<BusManagement> {
           onPressed: () {
             showModalBottomSheet(
               context: context,
+              isScrollControlled: true,
               builder: (context) {
-                return const AddBusSheet();  // This will need to be defined too
+                
+                return const AddStationSheet();
               },
             );
           },
@@ -57,3 +73,4 @@ class _BusManagementState extends State<BusManagement> {
     );
   }
 }
+

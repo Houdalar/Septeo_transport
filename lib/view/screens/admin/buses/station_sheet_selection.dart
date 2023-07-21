@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../model/station.dart';
-import '../../../viewmodel/station_services.dart';
+import '../../../../model/station.dart';
+import '../../../../viewmodel/station_services.dart';
 
 class StationSelectionScreen extends StatefulWidget {
   const StationSelectionScreen({super.key});
@@ -24,7 +24,7 @@ class _StationSelectionScreenState extends State<StationSelectionScreen> {
   }
 // get the list of stations from the server
 _getStationList() async {
-    var stations = await StationService().getStations();
+    var stations = await StationService.getStations();
     setState(() {
       allStations = stations;
     });

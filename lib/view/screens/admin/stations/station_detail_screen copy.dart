@@ -4,10 +4,10 @@ import 'package:latlong2/latlong.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../../../model/bus.dart';
-import '../../../model/station.dart';
-import '../../components/app_colors.dart';
-import '../../components/stations_bus.dart';
+import '../../../../model/bus.dart';
+import '../../../../model/station.dart';
+import '../../../components/app_colors.dart';
+import '../../../components/stations_bus.dart';
 
 class StationDetailsScreen2 extends StatefulWidget {
   final Station station;

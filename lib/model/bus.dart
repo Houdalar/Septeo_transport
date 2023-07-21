@@ -8,7 +8,6 @@ class Bus {
     required this.capacity , required this.busNumber});
 
   factory Bus.fromJson(Map<String, dynamic> json) {
-    ;
 
     return Bus(
       id: json['_id'],

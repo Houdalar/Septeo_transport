@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/model/bus.dart';
-import '../../../model/station.dart';
-import '../../../viewmodel/bus_services.dart';
-import '../../components/app_colors.dart';
+import '../../../../model/station.dart';
+import '../../../../viewmodel/bus_services.dart';
+import '../../../components/app_colors.dart';
 import 'station_sheet_selection.dart';
 
 class BusDetailsTab extends StatefulWidget {
   final Bus bus;
   final ScrollController scrollController;
+  final bool isdriver;
 
-  BusDetailsTab({required this.bus, required this.scrollController});
+  BusDetailsTab({required this.bus, required this.scrollController , required this.isdriver});
 
   @override
   _BusDetailsTabState createState() => _BusDetailsTabState();
@@ -132,6 +133,7 @@ class _BusDetailsTabState extends State<BusDetailsTab> {
                 ),
               ),
             const SizedBox(height: 15),
+            if(!widget.isdriver)
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.9,
               child: ElevatedButton(

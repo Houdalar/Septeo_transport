@@ -19,7 +19,7 @@ void requestLocationPermission() async {
 
 class StationService extends ChangeNotifier {
   static String baseUrl = "10.0.2.2:8080"; // for anfroid emulator
-  //static String baseUrl = "192.168.250.41:8080"; // for real device
+  //static String baseUrl = "192.168.250.165:8080"; // for real device
 
 
   final String key = 'AIzaSyADG1lENsRv14KlWdZgXOuMfcl_lf0MaXA';
@@ -110,7 +110,7 @@ class StationService extends ChangeNotifier {
     }
   }
 
-  Future<List<Station>> getStations() async {
+  static Future<List<Station>> getStations() async {
     final String url = 'http://$baseUrl/stations';
     final response = await http.get(Uri.parse(url));
 
