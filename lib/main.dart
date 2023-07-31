@@ -56,17 +56,17 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
         ),*/
       ),
-      initialRoute: '/AppHome',
+      initialRoute: '/home',
        onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':
             return MaterialPageRoute(builder: (context) =>  const LoginPage());
           case '/home':
             //final String role = settings.arguments as String;
-            return MaterialPageRoute(builder: (context) => Home(role:'Admin'));
+            return MaterialPageRoute(builder: (context) => const Home(role:'Driver'));
           case '/AppHome':
           //final String role = settings.arguments as String;
-            return MaterialPageRoute(builder: (context) => AppHome( userType: 'Admin'));
+            return MaterialPageRoute(builder: (context) => const AppHome( userType: 'Employee'));
           default:
             return null;
         }

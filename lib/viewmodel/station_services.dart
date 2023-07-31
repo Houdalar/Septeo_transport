@@ -267,6 +267,19 @@ List<LatLng> decodePolyline(String encoded) {
           });
     }
   }
+
+
+static Future<List<Station>> getPlanningStations(String busId) async {
+    final response = await http.get(Uri.parse('$baseUrl/stations/todayroute/$busId'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((item) => Station.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load stations');
+    }
+  }
+
 }
 
  

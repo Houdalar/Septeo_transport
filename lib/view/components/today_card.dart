@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:septeo_transport/model/user.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 
 import '../../model/planning.dart';

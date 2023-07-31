@@ -29,7 +29,7 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
 
   Future<List<Station>> fetchStations() async {
     // Call the API to fetch the stations
-    List<Station> stations = await StationService.fetchStations(widget.bus.id);
+    List<Station> stations = await StationService.getPlanningStations(widget.bus.id);
     return stations;
   }
 

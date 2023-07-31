@@ -19,6 +19,7 @@ class UserItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var status = 'Online' ;
     return GestureDetector(
       onLongPress: () {
         showDialog<String>(
@@ -30,8 +31,7 @@ class UserItem extends StatelessWidget {
               TextButton(
                 onPressed: () async {
                   Navigator.pop(context, 'Update');
-                  showAddOrUpdateUserSheet(context,user: user );
-                  
+                  showAddOrUpdateUserSheet(context, user: user);
                 },
                 child: const Text('UPDATE'),
               ),
@@ -46,13 +46,23 @@ class UserItem extends StatelessWidget {
           ),
         );
       },
-      child: Card(
-        child: ListTile(
-          leading: const CircleAvatar(
-            backgroundImage:
-                NetworkImage("user.image"), // assuming user has an image URL
+      child: ListTile(
+        leading: const CircleAvatar(
+          backgroundImage: NetworkImage("user.imageUrl"), // assuming user has an image URL
+          radius: 30,
+        ),
+        title: Text(user.username, style: const TextStyle(color: Colors.black, fontSize: 16)),
+        subtitle: Text(user.role.toString(), style: const TextStyle(color: Colors.grey, fontSize: 12)),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: status == 'Online' ? Colors.green : Colors.red,
+            borderRadius: BorderRadius.circular(20),
           ),
-          title: Text(user.username), // assuming user has a username property
+          child: Text(
+           status,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
         ),
       ),
     );

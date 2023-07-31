@@ -12,7 +12,7 @@ class UserManagement extends StatefulWidget {
 }
 
 class _UserManagementState extends State<UserManagement> {
-   void showAddOrUpdateUserSheet(BuildContext context) {
+  void showAddOrUpdateUserSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -20,21 +20,35 @@ class _UserManagementState extends State<UserManagement> {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Management', style: TextStyle(color: Colors.white))
+        title: const Text('User Management'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back , color: AppColors.primaryDarkBlue,),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+
       ),
       body: FutureBuilder<List<User>>(
         future: UserViewModel.getUsers(),
         builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
           if (snapshot.hasData) {
-            return ListView.builder(
+            return ListView.separated(
+              padding: const EdgeInsets.fromLTRB(10,5, 10, 5),
               itemCount: snapshot.data!.length,
               itemBuilder: (BuildContext context, int index) {
                 User user = snapshot.data![index];
-                return UserItem(user: user);  // Updated line
+                return UserItem(user: user);
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return const Divider(); // You can modify this to customize the look of the divider.
               },
             );
           } else if (snapshot.hasError) {
@@ -46,7 +60,7 @@ class _UserManagementState extends State<UserManagement> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-         showAddOrUpdateUserSheet(context );
+          showAddOrUpdateUserSheet(context);
         },
         backgroundColor: AppColors.secondaryDarkOrange,
         child: const Icon(Icons.add),
