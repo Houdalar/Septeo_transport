@@ -16,9 +16,13 @@ class UserViewModel extends ChangeNotifier {
 
   UserViewModel();
 
-  static Future<void> login(
-      String? email, String? password, BuildContext context) async {
-    Map<String, dynamic> userData = {"email": email, "password": password};
+  static Future<void> login(String? email, String? password,
+      BuildContext context, String? token) async {
+    Map<String, dynamic> userData = {
+      "email": email,
+      "password": password,
+      "registrationToken": token, // Add the registration token here
+    };
 
     Map<String, String> headers = {
       "Content-Type": "application/json; charset=UTF-8"
@@ -170,23 +174,27 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-  static Future<List<Planning>> fetchPlannings(String user, DateTime date) async {
-  final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+  static Future<List<Planning>> fetchPlannings(
+      String user, DateTime date) async {
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
 
-  final response = await http.get(Uri.parse('http://$baseUrl/planning/$user/$formattedDate'));
+    final response = await http
+        .get(Uri.parse('http://$baseUrl/planning/$user/$formattedDate'));
 
-  if (response.statusCode == 200) {
-    Iterable jsonResponse = jsonDecode(response.body);
-    List<Planning> plannings = List<Planning>.from(jsonResponse.map((model)=> Planning.fromJson(model)));
-    return plannings;
-  } else {
-    throw Exception('Failed to load plannings');
+    if (response.statusCode == 200) {
+      Iterable jsonResponse = jsonDecode(response.body);
+      List<Planning> plannings = List<Planning>.from(
+          jsonResponse.map((model) => Planning.fromJson(model)));
+      return plannings;
+    } else {
+      throw Exception('Failed to load plannings');
+    }
   }
-}
 
   Future<void> deletePlanning(String id) async {
     try {
-      final response = await http.delete(Uri.parse('http://$baseUrl/planning/$id'));
+      final response =
+          await http.delete(Uri.parse('http://$baseUrl/planning/$id'));
 
       if (response.statusCode == 200) {
         plannings.removeWhere((planning) => planning.id == id);
@@ -208,7 +216,7 @@ class UserViewModel extends ChangeNotifier {
     String startBusId,
     String finishBusId,
   ) async {
-    final url = 'http://$baseUrl/planning'; 
+    final url = 'http://$baseUrl/planning';
     final Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       // If needed add your auth headers
@@ -221,7 +229,7 @@ class UserViewModel extends ChangeNotifier {
       'startbus': startBusId,
       'finishbus': finishBusId,
     };
-    
+
     final response = await http.put(
       Uri.parse(url),
       headers: headers,
@@ -236,22 +244,22 @@ class UserViewModel extends ChangeNotifier {
   }
 
   static Future<Planning?> getTodayPlanning(String id) async {
-  var url = Uri.parse('http://$baseUrl/todayplanning/$id');
-  var response = await http.get(url);
+    var url = Uri.parse('http://$baseUrl/todayplanning/$id');
+    var response = await http.get(url);
 
-  if (response.statusCode == 200) {
-    var jsonResponse = json.decode(response.body);
-    return Planning.fromJson(jsonResponse);
-  } else if (response.statusCode == 404) {
-    return null;
-  } else {
-    throw Exception('Failed to load planning');
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      return Planning.fromJson(jsonResponse);
+    } else if (response.statusCode == 404) {
+      return null;
+    } else {
+      throw Exception('Failed to load planning');
+    }
   }
-}
 
   static Future<List<User>> getUsers() async {
     final response = await http.get(Uri.parse('http://$baseUrl/users'));
-    
+
     if (response.statusCode == 200) {
       // If the server returns a 200 OK response, parse the JSON.
       List jsonResponse = json.decode(response.body);
@@ -264,7 +272,7 @@ class UserViewModel extends ChangeNotifier {
 
   static Future<User> getUser(String id) async {
     final response = await http.get(Uri.parse('http://$baseUrl/user/$id'));
-    
+
     if (response.statusCode == 200) {
       // If the server returns a 200 OK response, parse the JSON.
       return User.fromJson(json.decode(response.body));
@@ -274,7 +282,8 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-  static Future<User> createUser(String email, String password, String username, String role) async {
+  static Future<User> createUser(
+      String email, String password, String username, String role) async {
     final response = await http.post(
       Uri.parse('http://$baseUrl/user'),
       headers: <String, String>{
@@ -307,7 +316,8 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-  static Future<User> updateUser(String id, String email, String password, String username, String role) async {
+  static Future<User> updateUser(String id, String email, String password,
+      String username, String role) async {
     final response = await http.put(
       Uri.parse('http://$baseUrl/user/$id'),
       headers: <String, String>{
@@ -329,7 +339,4 @@ class UserViewModel extends ChangeNotifier {
       throw Exception('Failed to update user.');
     }
   }
-
- 
-
 }

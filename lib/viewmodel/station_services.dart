@@ -21,7 +21,6 @@ class StationService extends ChangeNotifier {
   static String baseUrl = "10.0.2.2:8080"; // for anfroid emulator
   //static String baseUrl = "192.168.250.165:8080"; // for real device
 
-
   final String key = 'AIzaSyADG1lENsRv14KlWdZgXOuMfcl_lf0MaXA';
   static const String apiKey =
       '5b3ce3597851110001cf6248f55d7a31499e40848c6848d7de8fa624';
@@ -41,9 +40,7 @@ class StationService extends ChangeNotifier {
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-     
     );
-   
 
     if (response.statusCode == 200) {
       var stationList = json.decode(response.body) as List;
@@ -213,33 +210,36 @@ class StationService extends ChangeNotifier {
   }
 //return results ;
 
-Future<List<LatLng>> getOpenRouteCoordinates(LatLng startPoint, LatLng endPoint) async {
-  var response = await http.get(getGraphHopperRouteUrl(startPoint, endPoint));
+  Future<List<LatLng>> getOpenRouteCoordinates(
+      LatLng startPoint, LatLng endPoint) async {
+    var response = await http.get(getGraphHopperRouteUrl(startPoint, endPoint));
 
-  print(response.body);
+    print(response.body);
 
-if (response.statusCode == 200) {
-    var data = jsonDecode(response.body);
-    String encodedPolyline = data['paths'][0]['points'];
-    List<LatLng> points = decodePolyline(encodedPolyline);
-    return points;
-  } else {
-    throw Exception('Failed to load coordinates');
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      String encodedPolyline = data['paths'][0]['points'];
+      List<LatLng> points = decodePolyline(encodedPolyline);
+      return points;
+    } else {
+      throw Exception('Failed to load coordinates');
+    }
   }
-}
 
 /*Uri getRouteUrl(LatLng startPoint, LatLng endPoint) {
   return Uri.parse('https://www.openstreetmap.org/directions?api_key=$apiKey&start=${startPoint.latitude},${startPoint.longitude}&end=${endPoint.latitude},${endPoint.longitude}');
 }*/
-Uri getGraphHopperRouteUrl(LatLng startPoint, LatLng endPoint) {
-  return Uri.parse('https://graphhopper.com/api/1/route?point=${startPoint.latitude},${startPoint.longitude}&point=${endPoint.latitude},${endPoint.longitude}&vehicle=car&locale=en&key=2922eb17-0b68-43d8-bd67-36046c2fa94e');
-}
+  Uri getGraphHopperRouteUrl(LatLng startPoint, LatLng endPoint) {
+    return Uri.parse(
+        'https://graphhopper.com/api/1/route?point=${startPoint.latitude},${startPoint.longitude}&point=${endPoint.latitude},${endPoint.longitude}&vehicle=car&locale=en&key=2922eb17-0b68-43d8-bd67-36046c2fa94e');
+  }
 
-List<LatLng> decodePolyline(String encoded) {
- var decodedPoints = PolylinePoints().decodePolyline(encoded);
-  List<LatLng> points = decodedPoints.map((p) => LatLng(p.latitude, p.longitude)).toList();
-  return points;
-}
+  List<LatLng> decodePolyline(String encoded) {
+    var decodedPoints = PolylinePoints().decodePolyline(encoded);
+    List<LatLng> points =
+        decodedPoints.map((p) => LatLng(p.latitude, p.longitude)).toList();
+    return points;
+  }
 
   void deleteStation(String id, BuildContext context) async {
     final response = await http.delete(
@@ -268,18 +268,23 @@ List<LatLng> decodePolyline(String encoded) {
     }
   }
 
-
-static Future<List<Station>> getPlanningStations(String busId) async {
-    final response = await http.get(Uri.parse('$baseUrl/stations/todayroute/$busId'));
+  static Future<List<Station>> getPlanningStations(String busId) async {
+    final response =
+        await http.get(Uri.parse('http://$baseUrl/stations/todayroute/$busId'));
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
-      return jsonResponse.map((item) => Station.fromJson(item)).toList();
+      if (jsonResponse.isEmpty) {
+        // Return an empty list if the jsonResponse is empty
+        print(jsonResponse);
+        return [];
+      } else {
+        return jsonResponse.map((item) => Station.fromJson(item)).toList();
+      }
     } else {
       throw Exception('Failed to load stations');
     }
   }
-
 }
 
  

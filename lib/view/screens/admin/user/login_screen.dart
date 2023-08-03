@@ -1,13 +1,12 @@
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:septeo_transport/viewmodel/user_services.dart';
 
 import '../../../components/app_colors.dart';
 
-
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}): super(key: key);
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   LoginPageState createState() => LoginPageState();
@@ -46,7 +45,7 @@ class LoginPageState extends State<LoginPage> {
         fillColor: AppColors.auxiliaryOffWhite,
         prefixIcon: const Icon(
           Icons.email,
-          color: AppColors.auxiliaryGrey ,
+          color: AppColors.auxiliaryGrey,
         ),
       ),
       validator: (value) {
@@ -91,17 +90,19 @@ class LoginPageState extends State<LoginPage> {
     );
 
     final loginButton = ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         if (_formKey.currentState!.validate()) {
-          
           String email = _emailController.text;
           String password = _passwordController.text;
 
-          UserViewModel.login(email, password, context);
+          // Get the registration token
+          String? token = await FirebaseMessaging.instance.getToken();
+
+          UserViewModel.login(email, password, context, token);
         }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryOrange,  
+        backgroundColor: AppColors.primaryOrange,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32.0),
         ),
@@ -110,22 +111,22 @@ class LoginPageState extends State<LoginPage> {
       child: const Text(
         'Log In',
         style: TextStyle(
-          color: AppColors.auxiliaryOffWhite,  
+          color: AppColors.auxiliaryOffWhite,
           fontSize: 20.0,
         ),
       ),
     );
 
-   return Scaffold(
-      body: Center( 
+    return Scaffold(
+      body: Center(
         child: SingleChildScrollView(
-          child: Padding(  
+          child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,  
-                crossAxisAlignment: CrossAxisAlignment.stretch, 
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Container(
                     height: 150.0,
@@ -133,18 +134,21 @@ class LoginPageState extends State<LoginPage> {
                     margin: const EdgeInsets.fromLTRB(0, 30, 0, 10),
                     child: logo,
                   ),
-                  const SizedBox(height: 20.0),  
+                  const SizedBox(height: 20.0),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 20),
                     child: email,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 20),
                     child: password,
                   ),
-                  const SizedBox(height: 20.0), 
+                  const SizedBox(height: 20.0),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 10),
                     child: loginButton,
                   ),
                 ],
@@ -155,7 +159,7 @@ class LoginPageState extends State<LoginPage> {
       ),
     );
   }
-  
+
   @override
   void dispose() {
     // Clean up the controllers when the widget is disposed.

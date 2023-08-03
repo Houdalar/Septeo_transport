@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1060083028142",
+    "project_id": "septeo",
+    "storage_bucket": "septeo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1060083028142:android:de97cd1876caa345da5d3f",
+        "android_client_info": {
+          "package_name": "com.example.septeo_transport"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1060083028142-01djub0uosvofve8oj92aegu73ds4j6i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvTWM1HLduhzS23v5u5J_x7Q6fM-540LQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1060083028142-01djub0uosvofve8oj92aegu73ds4j6i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1060083028142-f1nnmps6jush9i0hf1m81s935iogsimp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.septeoTransport"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

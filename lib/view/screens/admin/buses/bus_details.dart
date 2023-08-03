@@ -12,7 +12,8 @@ class BusDetailsScreen extends StatefulWidget {
   final Bus bus;
   final bool isdriver;
 
-  const BusDetailsScreen({super.key, required this.bus, required this.isdriver});
+  const BusDetailsScreen(
+      {super.key, required this.bus, required this.isdriver});
 
   @override
   _BusDetailsScreenState createState() => _BusDetailsScreenState();
@@ -29,7 +30,8 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
 
   Future<List<Station>> fetchStations() async {
     // Call the API to fetch the stations
-    List<Station> stations = await StationService.getPlanningStations(widget.bus.id);
+    List<Station> stations =
+        await StationService.getPlanningStations(widget.bus.id);
     return stations;
   }
 
@@ -46,28 +48,28 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
     }).toSet();
   }
 
-Future<Set<Polyline>> createPolylines(List<Station> stations) async {
-  PolylineId id = const PolylineId('poly');
-  
-  List<LatLng> polylineCoordinates = [];
+  Future<Set<Polyline>> createPolylines(List<Station> stations) async {
+    PolylineId id = const PolylineId('poly');
 
-  for (var i = 0; i < stations.length - 1; i++) {
-    List<LatLng> route = await stationService.getOpenRouteCoordinates(
-      LatLng(stations[i].location.lat, stations[i].location.lng),
-      LatLng(stations[i + 1].location.lat, stations[i + 1].location.lng)
+    List<LatLng> polylineCoordinates = [];
+
+    for (var i = 0; i < stations.length - 1; i++) {
+      List<LatLng> route = await stationService.getOpenRouteCoordinates(
+          LatLng(stations[i].location.lat, stations[i].location.lng),
+          LatLng(stations[i + 1].location.lat, stations[i + 1].location.lng));
+      polylineCoordinates.addAll(route);
+    }
+
+    Polyline polyline = Polyline(
+      polylineId: id,
+      color: Colors.blue,
+      points: polylineCoordinates,
+      width: 2,
     );
-    polylineCoordinates.addAll(route);
+
+    return {polyline};
   }
 
-  Polyline polyline = Polyline(
-    polylineId: id,
-    color: Colors.blue,
-    points: polylineCoordinates,
-    width: 2,
-  );
-
-  return {polyline};
-}
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -113,7 +115,9 @@ Future<Set<Polyline>> createPolylines(List<Station> stations) async {
                               zoom: 13.0,
                             ),
                             markers: markers,
-                            polylines: polylines,
+                            polylines: snapshot.data!.isEmpty
+                                ? Set<Polyline>()
+                                : polylines,
                           );
                         }
                       });
@@ -195,7 +199,10 @@ Future<Set<Polyline>> createPolylines(List<Station> stations) async {
                   StationsTab(
                       stations: stations, scrollController: scrollController),
                   BusDetailsTab(
-                      scrollController: scrollController, bus: widget.bus , isdriver: widget.isdriver,),
+                    scrollController: scrollController,
+                    bus: widget.bus,
+                    isdriver: widget.isdriver,
+                  ),
                 ],
               ),
             ),
