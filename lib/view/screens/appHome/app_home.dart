@@ -3,8 +3,6 @@ import 'package:septeo_transport/view/components/app_colors.dart';
 import 'package:septeo_transport/view/screens/admin/buses/bus_management.dart';
 import 'package:septeo_transport/view/screens/appHome/quick_access.dart';
 
-
-
 import '../admin/user/home_page.dart';
 import '../admin/user/user_managment_screen.dart';
 // Import other pages here...
@@ -38,99 +36,8 @@ class _AppHomeState extends State<AppHome> {
         appBar: AppBar(
           title: const Text('HomePage', style: TextStyle(fontSize: 20)),
           backgroundColor: Colors.transparent,
-          leading: Builder(
-            builder: (BuildContext context) {
-              return IconButton(
-                icon: const Icon(
-                  Icons.window,
-                  color: AppColors.primaryDarkBlue,
-                  size: 30,
-                ), // replace with your custom icon
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-              );
-            },
-          ),
         ),
         body: _children[_currentIndex],
-        drawer: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(40),
-            bottomRight: Radius.circular(40),
-          ),
-          child: Drawer(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: <Widget>[
-                Column(
-                  children: [
-                    const SizedBox(height: 100),
-                    buildListTile(
-                      title: 'Home',
-                      index: 0,
-                      onTap: () {
-                        setState(() {
-                          _currentIndex = 0;
-                          _currentDrawerIndex = 0;
-                        });
-                        Navigator.pop(context);
-                      },
-                    ),
-                    buildListTile(
-                      title: 'Transport',
-                      index: 1,
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Home(role: widget.userType)),
-                        );
-                      },
-                    ),
-                    buildListTile(
-                      title: 'Vacation Management',
-                      index: 2,
-                      onTap: () {
-                        setState(() {
-                          _currentIndex = 2;
-                          _currentDrawerIndex = 2;
-                        });
-                        Navigator.pop(context);
-                      },
-                    ),
-                    buildListTile(
-                      title: 'Payday Advance Management',
-                      index: 3,
-                      onTap: () {
-                        setState(() {
-                          _currentIndex = 3;
-                          _currentDrawerIndex = 3;
-                        });
-                        Navigator.pop(context);
-                      },
-                    ),
-                    if (widget.userType != 'driver')
-                      buildListTile(
-                        title: 'User Management',
-                        index: 4,
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => UserManagement()),
-                          );
-                        },
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

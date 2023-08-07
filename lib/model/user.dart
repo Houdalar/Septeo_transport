@@ -4,6 +4,7 @@ class User {
   String password;
   String username;
   Role role;
+  String registrationToken;
 
   User({
     required this.id,
@@ -11,6 +12,7 @@ class User {
     required this.password,
     required this.username,
     required this.role,
+    required  this.registrationToken,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -36,6 +38,7 @@ class User {
       password: json['password'],
       username: json['username'],
       role: role,
+      registrationToken: json['registrationToken'],
       
     );
   }

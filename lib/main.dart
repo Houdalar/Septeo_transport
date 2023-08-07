@@ -10,47 +10,111 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'view/screens/admin/user/login_screen.dart';
 import 'view/screens/appHome/app_home.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:uni_links/uni_links.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
-  if (defaultTargetPlatform == TargetPlatform.android) {
-    AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
-  }
-
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
+  // Request notification permissions for iOS
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
-    announcement: false,
     badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
     sound: true,
   );
 
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await FlutterLocalNotificationsPlugin().initialize(initializationSettings);
+
   print('User granted permission: ${settings.authorizationStatus}');
-
-  String? token = await messaging.getToken();
-  print('User registration token: $token');
-
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
-
-    if (notification != null && android != null) {
-      print('Message title: ${notification.title}');
-      print('Message body: ${notification.body}');
-    }
-  });
 
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  Future<void> _showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails('your channel id', 'your channel name',
+            importance: Importance.max,
+            priority: Priority.high,
+            showWhen: false);
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin
+        .show(0, title, body, platformChannelSpecifics, payload: '/AppHome');
+  }
+
+  String? _deepLink;
+  @override
+  void initState() {
+    super.initState();
+    initUniLinks();
+
+    _firebaseMessaging.getToken().then((String? token) {
+      assert(token != null);
+      print("Firebase Messaging Token: $token");
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+
+      if (notification != null && android != null) {
+        _showNotification(
+            notification.title ?? "new message for your bus driver",
+            notification.body ??
+                ""); // Show a local notification when a push notification is received
+      }
+    });
+    Future.delayed(Duration.zero, () {
+      if (_deepLink != null) {
+        Navigator.of(context).pushNamed(_deepLink!);
+      }
+    });
+  }
+
+  Future<void> initUniLinks() async {
+    // Get the initial deep link if the app was launched with one
+    try {
+      _deepLink = await getInitialLink();
+      print('Initial link: $_deepLink'); // Add this line
+      if (_deepLink != null) {
+        Navigator.of(context).pushNamed(_deepLink!);
+      }
+    } catch (e) {
+      // Handle error
+    }
+
+    // Listen for deep links while the app is running
+    getLinksStream().listen((String? link) {
+      print('Link: $link'); // Add this line
+      if (link != null) {
+        Future.delayed(Duration.zero, () {
+          Navigator.of(context).pushNamed(link);
+        });
+      }
+    }, onError: (err) {
+      // Handle error
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,17 +139,18 @@ class MyApp extends StatelessWidget {
           displayColor: AppColors.primaryDarkBlue,
         ),
       ),
-      initialRoute: '/home',
+      initialRoute: '/AppHome',
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':
             return MaterialPageRoute(builder: (context) => const LoginPage());
           case '/home':
-            return MaterialPageRoute(
-                builder: (context) => const Home(role: 'Driver'));
+            final String role = settings.arguments as String;
+            return MaterialPageRoute(builder: (context) => Home(role: role));
           case '/AppHome':
+          // final String role = settings.arguments as String;
             return MaterialPageRoute(
-                builder: (context) => const AppHome(userType: 'Employee'));
+                builder: (context) =>  AppHome(userType: "Admin"));
           default:
             return null;
         }

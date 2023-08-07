@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -9,19 +10,25 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import '../model/user.dart';
 import '../view/components/app_colors.dart';
 
+
+
+
 class UserViewModel extends ChangeNotifier {
-  static String baseUrl = "10.0.2.2:8080";
+  //static String baseUrl = "10.0.2.2:8080";
   //static String baseUrl = "192.168.250.165:8080";
+  
+   static String baseUrl = "10.0.2.2:62668";
   List<Planning> plannings = [];
 
   UserViewModel();
 
   static Future<void> login(String? email, String? password,
       BuildContext context, String? token) async {
+    String? token = await FirebaseMessaging.instance.getToken();
     Map<String, dynamic> userData = {
       "email": email,
       "password": password,
-      "registrationToken": token, // Add the registration token here
+      "registrationToken": token, 
     };
 
     Map<String, String> headers = {
@@ -338,5 +345,24 @@ class UserViewModel extends ChangeNotifier {
       // If the server did not return a 200 OK response, throw an exception.
       throw Exception('Failed to update user.');
     }
+  }
+
+  static Future<void> sendMessage(String busId, String message) async {
+    Map<String, dynamic> messageData = {"busId": busId, "message": message};
+
+    Map<String, String> headers = {
+      "Content-Type": "application/json; charset=UTF-8"
+    };
+
+    http
+        .post(Uri.http(baseUrl, "/message"),
+            body: json.encode(messageData), headers: headers)
+        .then((http.Response response) {
+      if (response.statusCode == 200) {
+        print('Message sent successfully');
+      } else {
+        print('Failed to send message: ${response.statusCode}');
+      }
+    });
   }
 }

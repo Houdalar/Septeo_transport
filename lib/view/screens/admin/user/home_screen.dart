@@ -11,7 +11,8 @@ import '../../../components/station_card.dart';
 import '../../../components/today_card.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String id ;
+  const HomePage({super.key , required this.id});
 
   @override
   State<HomePage> createState() => _HomePageState();

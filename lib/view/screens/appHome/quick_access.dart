@@ -3,6 +3,7 @@ import 'package:septeo_transport/view/components/app_colors.dart';
 
 import '../../components/search_bar.dart';
 import '../admin/buses/bus_management.dart';
+import '../admin/user/home_screen.dart';
 
 class QuickAccess extends StatefulWidget {
   @override
@@ -105,9 +106,7 @@ class _QuickAccessState extends State<QuickAccess> {
                     context,
                     'Transport Management',
                     'Bus driver-pana.png',
-                    const BusManagement(
-                      isdriver: false,
-                    )),
+                    const HomePage(id: '',)),
                 createQuickAccessCard(
                     context,
                     'user Management',

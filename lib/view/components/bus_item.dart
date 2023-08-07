@@ -3,6 +3,7 @@ import 'package:septeo_transport/view/components/app_colors.dart';
 
 import '../../model/bus.dart';
 import '../../viewmodel/bus_services.dart';
+import '../../viewmodel/user_services.dart';
 import '../screens/admin/buses/bus_details.dart';
 
 class BusCard extends StatelessWidget {
@@ -104,7 +105,7 @@ class BusCard extends StatelessWidget {
                           TextButton(
                             child: const Text('SEND'),
                             onPressed: () {
-                              
+                              UserViewModel.sendMessage(bus.id, _controller.text);
                               Navigator.of(context).pop();
                             },
                           ),

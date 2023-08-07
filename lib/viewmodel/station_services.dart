@@ -18,8 +18,9 @@ void requestLocationPermission() async {
 }
 
 class StationService extends ChangeNotifier {
-  static String baseUrl = "10.0.2.2:8080"; // for anfroid emulator
+ // static String baseUrl = "10.0.2.2:8080"; // for anfroid emulator
   //static String baseUrl = "192.168.250.165:8080"; // for real device
+  static String baseUrl = "10.0.2.2:62668";
 
   final String key = 'AIzaSyADG1lENsRv14KlWdZgXOuMfcl_lf0MaXA';
   static const String apiKey =
