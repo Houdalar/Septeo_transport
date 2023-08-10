@@ -11,8 +11,10 @@ import 'home_screen.dart';
 import 'settings_page.dart';
 
 class Home extends StatefulWidget {
+  final bool hasUnreadNotification ;
   const Home({
     super.key,
+    required this.hasUnreadNotification,
   });
 
   @override
@@ -25,7 +27,6 @@ class HomeState extends State<Home> {
     List<IconData> listOfIcons = [];
 
   List<String> listOfStrings = [];
-   bool hasUnreadNotification = false;
   @override
   void initState() {
     super.initState();
@@ -59,6 +60,7 @@ class HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     double displayWidth = MediaQuery.of(context).size.width;
+    bool hasUnreadNotification = false;
     return SafeArea(
       child: Scaffold(
         body: Stack(

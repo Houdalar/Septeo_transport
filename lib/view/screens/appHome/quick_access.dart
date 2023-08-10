@@ -65,7 +65,7 @@ class _QuickAccessState extends State<QuickAccess> {
                         child: Container(
                           padding: const EdgeInsets.all(1),
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 250, 178, 145),
+                            color: const Color.fromARGB(255, 250, 178, 145),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           constraints: const BoxConstraints(

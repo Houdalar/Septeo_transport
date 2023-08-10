@@ -92,10 +92,11 @@ class _MyAppState extends State<MyApp> {
             notification.title ?? "new message for your bus driver",
             notification.body ??
                 ""); 
-                setState(() {
+                
+      }
+      setState(() {
       hasUnreadNotification = true; 
     });
-      }
     });
     Future.delayed(Duration.zero, () {
       if (_deepLink != null) {
@@ -164,7 +165,7 @@ Future<void> _initializeUserId() async {
           case '/':
             return MaterialPageRoute(builder: (context) => const LoginPage());
           case '/home':
-            return MaterialPageRoute(builder: (context) => const Home());
+            return MaterialPageRoute(builder: (context) =>  Home(hasUnreadNotification: hasUnreadNotification));
           case '/splash':
             return MaterialPageRoute(
                 builder: (context) => SplashScreen(
