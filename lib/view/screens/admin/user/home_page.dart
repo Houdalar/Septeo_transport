@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../session_manager.dart';
 import '../../../components/app_colors.dart';
+import '../../appHome/quick_access.dart';
 import '../../employee/employee_space.dart';
 import '../buses/bus_management.dart';
 import 'admin_screen.dart';
@@ -9,8 +11,9 @@ import 'home_screen.dart';
 import 'settings_page.dart';
 
 class Home extends StatefulWidget {
-  final String role;
-  const Home({super.key, required this.role});
+  const Home({
+    super.key,
+  });
 
   @override
   HomeState createState() => HomeState();
@@ -18,185 +21,180 @@ class Home extends StatefulWidget {
 
 class HomeState extends State<Home> {
   var currentIndex = 0;
-
-  void initState() {
-    super.initState();
-
-    if (widget.role == "Admin") {
-      listOfIcons = [
-        Icons.home_rounded,
-        Icons.admin_panel_settings,
-        Icons.settings_rounded,
-      ];
-
-      listOfStrings = [
-        'Home',
-        'Admin',
-        'Settings',
-      ];
-    } else if (widget.role == "Driver") {
-      listOfIcons = [
-        Icons.directions_bus,
-        Icons.settings_rounded,
-      ];
-
-      listOfStrings = [
-        'driver',
-        'Settings',
-      ];
-    }else {
-      listOfIcons = [
-        Icons.home_rounded,
-        Icons.work_outline,
-        Icons.settings_rounded,
-      ];
-
-      listOfStrings = [
-        'Home',
-        'Employee',
-        'Settings',
-      ];
-    }
-  }
-
-   List<IconData> listOfIcons = [];
+  String? role;
+    List<IconData> listOfIcons = [];
 
   List<String> listOfStrings = [];
+  @override
+  void initState() {
+    super.initState();
+    //_initializeRole();
+    role = SessionManager.Role;
+     if (role == "Driver") {
+        listOfIcons = [
+          Icons.directions_bus,
+          Icons.settings_rounded,
+        ];
+        listOfStrings = [
+          'driver',
+          'Settings',
+        ];
+      } else {
+        listOfIcons = [
+          Icons.home_rounded,
+          Icons.work_outline,
+          Icons.settings_rounded,
+        ];
+        listOfStrings = [
+          'Home',
+          'transport',
+          'Settings',
+        ];
+      }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     double displayWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      bottomNavigationBar: Container(
-        margin: EdgeInsets.all(displayWidth * .05),
-        height: displayWidth * .155,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(.15),
-              blurRadius: 30,
-              offset: const Offset(0, 15),
-            ),
-          ],
-          borderRadius: BorderRadius.circular(50),
-        ),
-        child: ListView.builder(
-          itemCount:widget.role == "Driver"? 2: 3,
-          scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.symmetric(horizontal: displayWidth * .02) ,
-          itemBuilder: (context, index) => InkWell(
-            onTap: () {
-              setState(() {
-                currentIndex = index;
-                HapticFeedback.lightImpact();
-              });
-            },
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            child: Padding(
-              padding:  widget.role == "Driver"?EdgeInsets.symmetric(horizontal: displayWidth * .1)
-              : EdgeInsets.symmetric(horizontal: displayWidth * .03)
-              ,
-              child: Stack(
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(seconds: 1),
-                    curve: Curves.fastLinearToSlowEaseIn,
-                    width: index == currentIndex
-                        ? displayWidth * .32
-                        : displayWidth * .18,
-                    alignment: Alignment.center,
-                    child: AnimatedContainer(
-                      duration: const Duration(seconds: 1),
-                      curve: Curves.fastLinearToSlowEaseIn,
-                      height: index == currentIndex ? displayWidth * .12 : 0,
-                      width: index == currentIndex ? displayWidth * .32 : 0,
-                      decoration: BoxDecoration(
-                        color: index == currentIndex
-                            ? AppColors.primaryOrange
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(50),
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            IndexedStack(
+                index: currentIndex,
+                children: role == "Driver"
+                    ? [const BusManagement(), const SettingsPage()]
+                    : [QuickAccess(), const HomePage(), const SettingsPage()]),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                margin: EdgeInsets.all(displayWidth * .05),
+                height: displayWidth * .155,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(.15),
+                      blurRadius: 30,
+                      offset: const Offset(0, 15),
+                    ),
+                  ],
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: ListView.builder(
+                  itemCount: role == "Driver" ? 2 : 3,
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: displayWidth * .02),
+                  itemBuilder: (context, index) => InkWell(
+                    onTap: () {
+                      setState(() {
+                        currentIndex = index;
+                        HapticFeedback.lightImpact();
+                      });
+                    },
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    child: Padding(
+                      padding: role == "Driver"
+                          ? EdgeInsets.symmetric(horizontal: displayWidth * .1)
+                          : EdgeInsets.symmetric(
+                              horizontal: displayWidth * .03),
+                      child: Stack(
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(seconds: 1),
+                            curve: Curves.fastLinearToSlowEaseIn,
+                            width: index == currentIndex
+                                ? displayWidth * .32
+                                : displayWidth * .18,
+                            alignment: Alignment.center,
+                            child: AnimatedContainer(
+                              duration: const Duration(seconds: 1),
+                              curve: Curves.fastLinearToSlowEaseIn,
+                              height: index == currentIndex
+                                  ? displayWidth * .12
+                                  : 0,
+                              width: index == currentIndex
+                                  ? displayWidth * .32
+                                  : 0,
+                              decoration: BoxDecoration(
+                                color: index == currentIndex
+                                    ? AppColors.primaryOrange
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                            ),
+                          ),
+                          AnimatedContainer(
+                            duration: const Duration(seconds: 1),
+                            curve: Curves.fastLinearToSlowEaseIn,
+                            width: index == currentIndex
+                                ? displayWidth * .31
+                                : displayWidth * .18,
+                            alignment: Alignment.center,
+                            child: Stack(
+                              children: [
+                                Row(
+                                  children: [
+                                    AnimatedContainer(
+                                      duration: const Duration(seconds: 1),
+                                      curve: Curves.fastLinearToSlowEaseIn,
+                                      width: index == currentIndex
+                                          ? displayWidth * .13
+                                          : 0,
+                                    ),
+                                    AnimatedOpacity(
+                                      opacity: index == currentIndex ? 1 : 0,
+                                      duration: const Duration(seconds: 1),
+                                      curve: Curves.fastLinearToSlowEaseIn,
+                                      child: Text(
+                                        index == currentIndex
+                                            ? listOfStrings[index]
+                                            : '',
+                                        style: const TextStyle(
+                                          color: AppColors.auxiliaryOffWhite,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    AnimatedContainer(
+                                      duration: const Duration(seconds: 1),
+                                      curve: Curves.fastLinearToSlowEaseIn,
+                                      width: index == currentIndex
+                                          ? displayWidth * .03
+                                          : 20,
+                                    ),
+                                    Icon(
+                                      listOfIcons[index],
+                                      size: displayWidth * .076,
+                                      color: index == currentIndex
+                                          ? AppColors.auxiliaryOffWhite
+                                          : Colors.black26,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  AnimatedContainer(
-                    duration: const Duration(seconds: 1),
-                    curve: Curves.fastLinearToSlowEaseIn,
-                    width: index == currentIndex
-                        ? displayWidth * .31
-                        : displayWidth * .18,
-                    alignment: Alignment.center,
-                    child: Stack(
-                      children: [
-                        Row(
-                          children: [
-                            AnimatedContainer(
-                              duration: const Duration(seconds: 1),
-                              curve: Curves.fastLinearToSlowEaseIn,
-                              width: index == currentIndex
-                                  ? displayWidth * .13
-                                  : 0,
-                            ),
-                            AnimatedOpacity(
-                              opacity: index == currentIndex ? 1 : 0,
-                              duration: const Duration(seconds: 1),
-                              curve: Curves.fastLinearToSlowEaseIn,
-                              child: Text(
-                                index == currentIndex
-                                    ? listOfStrings[index]
-                                    : '',
-                                style: const TextStyle(
-                                  color: AppColors.auxiliaryOffWhite,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            AnimatedContainer(
-                              duration: const Duration(seconds: 1),
-                              curve: Curves.fastLinearToSlowEaseIn,
-                              width: index == currentIndex
-                                  ? displayWidth * .03
-                                  : 20,
-                            ),
-                            Icon(
-                              listOfIcons[index],
-                              size: displayWidth * .076,
-                              color: index == currentIndex
-                                  ? AppColors.auxiliaryOffWhite
-                                  : Colors.black26,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         ),
-      ),
-      body: IndexedStack(
-        index: currentIndex,
-        children: widget.role == "Driver"
-            ? [const BusManagement( isdriver: true,), const SettingsPage()]
-            : widget.role == "Admin"
-                ? [const HomePage(id: '',), const AdminSpace(), const SettingsPage()]
-                : [const HomePage(id: '',), const EmployeeSpace(), const SettingsPage()],
       ),
     );
   }
-
 }
-
-
-
-
-
-

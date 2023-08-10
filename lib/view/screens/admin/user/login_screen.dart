@@ -1,8 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:provider/provider.dart';
 import 'package:septeo_transport/viewmodel/user_services.dart';
-
 import '../../../components/app_colors.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,6 +20,7 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     final logo = Container(
       height: 150.0,
       width: double.infinity,
@@ -98,7 +99,7 @@ class LoginPageState extends State<LoginPage> {
           // Get the registration token
           String? token = await FirebaseMessaging.instance.getToken();
 
-          UserViewModel.login(email, password, context, token);
+          await userViewModel.login(email, password, token!, context);
         }
       },
       style: ElevatedButton.styleFrom(

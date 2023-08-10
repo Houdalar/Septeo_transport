@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:septeo_transport/constatns.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 import '../../../../model/user.dart';
 import '../../../../viewmodel/user_services.dart';
@@ -37,7 +39,8 @@ class _UserManagementState extends State<UserManagement> {
 
       ),
       body: FutureBuilder<List<User>>(
-        future: UserViewModel.getUsers(),
+        
+        future: Provider.of<UserViewModel>(context, listen: false).getUsers(),
         builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
           if (snapshot.hasData) {
             return ListView.separated(

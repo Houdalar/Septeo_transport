@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../../../constatns.dart';
 import '../../../../model/user.dart';
 import '../../../../viewmodel/user_services.dart';
 import '../../../components/app_colors.dart';
@@ -60,6 +62,7 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -109,7 +112,7 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
                   onPressed: () async{
                     if (_formKey.currentState!.validate()) {
                       if (widget.user != null) {
-                        await UserViewModel.updateUser(
+                        await userViewModel.updateUser(
                           widget.user!.id,
                           emailController.text,
                           usernameController.text,
@@ -117,7 +120,7 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
                           _selectedRole!,
                         );
                       } else {
-                        await UserViewModel.createUser(
+                        await userViewModel.createUser(
                           emailController.text,
                           usernameController.text,
                           passwordController.text,

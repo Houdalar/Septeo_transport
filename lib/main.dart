@@ -1,17 +1,17 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
+import 'package:septeo_transport/viewmodel/user_services.dart';
+import 'session_manager.dart';
 import 'view/screens/admin/user/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'view/screens/admin/user/login_screen.dart';
-import 'view/screens/appHome/app_home.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:uni_links/uni_links.dart';
+
+import 'view/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,19 +27,25 @@ void main() async {
 
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
-  final InitializationSettings initializationSettings = InitializationSettings(
+  const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
   );
 
   await FlutterLocalNotificationsPlugin().initialize(initializationSettings);
+  final UserViewModel userViewModel = UserViewModel();
 
-  print('User granted permission: ${settings.authorizationStatus}');
-
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider<UserViewModel>.value(
+      value: userViewModel,
+      child: MyApp(userId: SessionManager.userId),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final String? userId;
+
+  const MyApp({Key? key, this.userId}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -70,7 +76,6 @@ class _MyAppState extends State<MyApp> {
 
     _firebaseMessaging.getToken().then((String? token) {
       assert(token != null);
-      print("Firebase Messaging Token: $token");
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -95,7 +100,6 @@ class _MyAppState extends State<MyApp> {
     // Get the initial deep link if the app was launched with one
     try {
       _deepLink = await getInitialLink();
-      print('Initial link: $_deepLink'); // Add this line
       if (_deepLink != null) {
         Navigator.of(context).pushNamed(_deepLink!);
       }
@@ -139,18 +143,20 @@ class _MyAppState extends State<MyApp> {
           displayColor: AppColors.primaryDarkBlue,
         ),
       ),
-      initialRoute: '/AppHome',
+      initialRoute: '/splash',
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':
             return MaterialPageRoute(builder: (context) => const LoginPage());
           case '/home':
-            final String role = settings.arguments as String;
-            return MaterialPageRoute(builder: (context) => Home(role: role));
-          case '/AppHome':
-          // final String role = settings.arguments as String;
+            return MaterialPageRoute(builder: (context) => const Home());
+          case '/splash':
             return MaterialPageRoute(
-                builder: (context) =>  AppHome(userType: "Admin"));
+                builder: (context) => SplashScreen(
+                      nextRoute: widget.userId == "" || widget.userId!.isEmpty
+                          ? '/'
+                          : '/home',
+                    ));
           default:
             return null;
         }

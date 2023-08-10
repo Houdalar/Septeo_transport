@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:septeo_transport/session_manager.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 import 'package:septeo_transport/view/screens/admin/buses/add_bus_sheet.dart';
 
@@ -7,16 +8,24 @@ import '../../../../viewmodel/bus_services.dart';
 import '../../../components/bus_item.dart';
 
 class BusManagement extends StatefulWidget {
-  final bool isdriver;
-  const BusManagement({super.key, required this.isdriver});
+  const BusManagement({super.key,});
 
   @override
   _BusManagementState createState() => _BusManagementState();
 }
 
-class _BusManagementState extends State<BusManagement> {
+class _BusManagementState extends State<BusManagement>  {
+ bool? isdriver;
+@override
+  void initState() {
+    super.initState();
+    isdriver = SessionManager.Role == "driver" ? true : false;
+  }
   @override
   Widget build(BuildContext context) {
+    if (isdriver == null) {
+    return const CircularProgressIndicator(); 
+  }
     return SafeArea(
       child: Scaffold(
         body: FutureBuilder<List<Bus>>(
@@ -30,11 +39,11 @@ class _BusManagementState extends State<BusManagement> {
             } else {
               return Padding(
                 padding: EdgeInsets.only(
-                    top: widget.isdriver ? 30 : 120, left: 10.0, right: 10.0),
+                    top: isdriver! ? 30 : 120, left: 10.0, right: 10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (widget.isdriver)
+                    if (isdriver!)
                       const Text(" buses list",
                           style: TextStyle(
                               fontSize: 25, fontWeight: FontWeight.bold)),
@@ -44,7 +53,7 @@ class _BusManagementState extends State<BusManagement> {
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           var bus = snapshot.data![index];
-                          return BusCard(bus: bus , isdriver: widget.isdriver,);
+                          return BusCard(bus: bus , isdriver: isdriver!,);
                         },
                       ),
                     ),
@@ -54,7 +63,7 @@ class _BusManagementState extends State<BusManagement> {
             }
           },
         ),
-        floatingActionButton: !widget.isdriver
+        floatingActionButton: !isdriver!
             ? FloatingActionButton(
                 onPressed: () {
                   showModalBottomSheet(

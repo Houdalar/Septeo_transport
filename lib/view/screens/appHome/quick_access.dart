@@ -1,20 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 
+import '../../../session_manager.dart';
 import '../../components/search_bar.dart';
 import '../admin/buses/bus_management.dart';
-import '../admin/user/home_screen.dart';
+import '../admin/user/admin_screen.dart';
+import '../admin/user/user_managment_screen.dart';
+import '../employee/employee_space.dart';
 
 class QuickAccess extends StatefulWidget {
   @override
   State<QuickAccess> createState() => _QuickAccessState();
 }
 
-class _QuickAccessState extends State<QuickAccess> {
-  final String username = 'John Doe';
+class _QuickAccessState extends State<QuickAccess>   {
+  String? role;
+  @override
+  void initState() {
+    super.initState();
+    //setUserRole();
+    role = SessionManager.Role;
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (role == null) {
+      return const CircularProgressIndicator();
+    }
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -26,7 +38,7 @@ class _QuickAccessState extends State<QuickAccess> {
             ),
             Row(
               children: [
-                Text('Hi, $username!',
+                Text('Hi, john doe !',
                     style: Theme.of(context).textTheme.headlineMedium),
                 const Spacer(),
                 IconButton(
@@ -34,9 +46,7 @@ class _QuickAccessState extends State<QuickAccess> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const BusManagement(
-                                isdriver: false,
-                              )),
+                          builder: (context) => const BusManagement()),
                     );
                   },
                   icon: const Icon(Icons.notifications),
@@ -102,36 +112,18 @@ class _QuickAccessState extends State<QuickAccess> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: <Widget>[
-                createQuickAccessCard(
-                    context,
-                    'Transport Management',
-                    'Bus driver-pana.png',
-                    const HomePage(id: '',)),
-                createQuickAccessCard(
-                    context,
-                    'user Management',
-                    'Office management-cuate.png',
-                    const BusManagement(
-                      isdriver: false,
-                    )),
-                createQuickAccessCard(
-                    context,
-                    'payment Management',
-                    'Investment data-cuate.png',
-                    const BusManagement(
-                      isdriver: false,
-                    )),
-                createQuickAccessCard(
-                    context,
-                    'About us',
-                    'About us page-pana.png',
-                    const BusManagement(
-                      isdriver: false,
-                    )),
-                // createQuickAccessCard(context, 'Vacation Management', Icons.beach_access, VacationPage()),
-                // createQuickAccessCard(context, 'Payday Advance', Icons.payments, PaydayAdvancePage()),
-                // createQuickAccessCard(context, 'User Management', Icons.person, UsersManagementPage()),
-                // Add more cards if necessary
+                if (role == "Admin")
+                  createQuickAccessCard(context, 'Transport Management',
+                      'Bus driver-pana.png', const AdminSpace()),
+                if (role == "Admin")
+                  createQuickAccessCard(context, 'user Management',
+                      'Office management-cuate.png', UserManagement()),
+                createQuickAccessCard(context, 'payment Management',
+                    'Investment data-cuate.png', const BusManagement()),
+                createQuickAccessCard(context, 'bus Schedule',
+                    'Schedule-rafiki.png', const EmployeeSpace()),
+                createQuickAccessCard(context, 'About us',
+                    'About us page-pana.png', const BusManagement()),
               ],
             ),
           ],

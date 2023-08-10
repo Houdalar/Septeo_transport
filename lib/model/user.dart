@@ -45,3 +45,8 @@ class User {
 }
 
 enum Role { Admin, Employee, Driver }
+
+class LoginResponse {
+  String? token;
+  
+}

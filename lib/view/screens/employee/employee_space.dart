@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:septeo_transport/constatns.dart';
 
 import '../../../model/bus.dart';
 import '../../../model/planning.dart';
@@ -32,8 +34,9 @@ class _EmployeeSpaceState extends State<EmployeeSpace> {
 
   Future<void> fetchWeekPlanning() async {
     try {
-      var planning = await UserViewModel.fetchPlannings(
-          "64abf65cc2ce4294ccd8ae28", _selectedWeek);
+      final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+      var planning = await userViewModel.fetchPlannings(
+          "64c8d38c55578bd4fbad84db", _selectedWeek);
       setState(() {
         weekPlannings = planning;
         filterPlannings(_selectedDate);
@@ -61,53 +64,55 @@ class _EmployeeSpaceState extends State<EmployeeSpace> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 270,
-                child: MiniCalendar(
-                  onDaySelected: (date) {
-                    setState(() {
-                      _selectedDate = date;
-                    });
-                    filterPlannings(_selectedDate);
-                  },
-                  onWeekChanged: fetchNewWeek,
-                ),
-              ),
-              const SizedBox(height: 40),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Text(
-                  DateFormat('EEEE, d MMMM ').format(_selectedDate),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 270,
+                  child: MiniCalendar(
+                    onDaySelected: (date) {
+                      setState(() {
+                        _selectedDate = date;
+                      });
+                      filterPlannings(_selectedDate);
+                    },
+                    onWeekChanged: fetchNewWeek,
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.8,
-                child: filteredPlannings.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: filteredPlannings.length,
-                        itemBuilder: (context, index) {
-                          return PlanningCard(
-                              planning: filteredPlannings[index]);
-                        },
-                      )
-                    : const Padding(
-                        padding: EdgeInsets.all(20.0),
-                        child: Text('No plans for this date.'),
-                      ),
-              ),
-            ],
+                const SizedBox(height: 40),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text(
+                    DateFormat('EEEE, d MMMM ').format(_selectedDate),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: filteredPlannings.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: filteredPlannings.length,
+                          itemBuilder: (context, index) {
+                            return PlanningCard(
+                                planning: filteredPlannings[index]);
+                          },
+                        )
+                      : const Padding(
+                          padding: EdgeInsets.all(20.0),
+                          child: Text('No plans for this date.'),
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

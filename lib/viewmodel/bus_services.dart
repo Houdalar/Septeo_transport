@@ -16,7 +16,7 @@ void requestLocationPermission() async {
 
 class BusService extends ChangeNotifier {
   //static String baseUrl = "10.0.2.2:8080";
-  static String baseUrl = "10.0.2.2:62668";
+  static String baseUrl = "10.0.2.2:8080";
  // static String baseUrl = "192.168.250.165:8080"; // for real device
   final List<Bus> _bus = [];
   List<Bus> get bus {

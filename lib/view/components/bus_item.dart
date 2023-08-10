@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:septeo_transport/constatns.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 
 import '../../model/bus.dart';
@@ -105,7 +107,8 @@ class BusCard extends StatelessWidget {
                           TextButton(
                             child: const Text('SEND'),
                             onPressed: () {
-                              UserViewModel.sendMessage(bus.id, _controller.text);
+                              final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+                              userViewModel.sendMessage(bus.id, _controller.text);
                               Navigator.of(context).pop();
                             },
                           ),

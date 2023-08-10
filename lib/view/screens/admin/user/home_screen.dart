@@ -11,8 +11,8 @@ import '../../../components/station_card.dart';
 import '../../../components/today_card.dart';
 
 class HomePage extends StatefulWidget {
-  final String id ;
-  const HomePage({super.key , required this.id});
+  
+  const HomePage({super.key , });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -21,7 +21,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Station>? _stations;
   String _searchText = '';
-  String id = "64abf65cc2ce4294ccd8ae28";
+  UserViewModel userViewModel = UserViewModel();
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +57,13 @@ class _HomePageState extends State<HomePage> {
                 const Text("Today", style: TextStyle(fontSize: 20)),
                 const SizedBox(height: 20),
                 FutureBuilder<Planning?>(
-                  future: UserViewModel.getTodayPlanning(id),
+                  future: userViewModel.getTodayPlanning(),
                   builder: (BuildContext context,
                       AsyncSnapshot<Planning?> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
+                      return const Center(child: Text('No planning for today'));
                     } else if (snapshot.hasData) {
                       if (snapshot.data == null) {
                         return const Center(

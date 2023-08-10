@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:septeo_transport/model/planning.dart';
 
+import '../../../constatns.dart';
 import '../../../model/bus.dart';
 import '../../../model/station.dart';
 import '../../../viewmodel/station_services.dart';
@@ -22,6 +24,7 @@ class _AddPlanningFormState extends State<AddPlanningForm> {
   ArrivalTime? _selectedToBus;
   List<Station> _stations = [];
   bool _isUpdateMode = false;
+  
 
   @override
   void initState() {
@@ -87,6 +90,7 @@ class _AddPlanningFormState extends State<AddPlanningForm> {
   }
 
  void _submit() async {
+  final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     if (_selectedFromStation == null ||
         _selectedToStation == null ||
         _selectedFromBus == null ||
@@ -102,7 +106,8 @@ class _AddPlanningFormState extends State<AddPlanningForm> {
 
     if (widget.planning == null) {
       // In add mode, add the planning
-      await UserViewModel.addPlanning(
+      
+      await userViewModel.addPlanning(
           id,
           widget.selectedDate!.toIso8601String(),
           _selectedFromStation!.id,
@@ -112,7 +117,7 @@ class _AddPlanningFormState extends State<AddPlanningForm> {
           context);
     } else {
       // In update mode, update the planning
-     _isUpdateMode = await UserViewModel.updatePlanning(
+     _isUpdateMode = await userViewModel.updatePlanning(
           widget.planning!.id,
           DateTime.now().toIso8601String(),
           _selectedFromStation!.id,

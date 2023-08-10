@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:septeo_transport/constatns.dart';
 import '../../../../model/user.dart';
 import '../../../../viewmodel/user_services.dart';
 import '../screens/admin/user/add_update_user_sheet.dart';
@@ -37,7 +39,8 @@ class UserItem extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () async {
-                  await UserViewModel.deleteUser(user.id);
+                  final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+                  await userViewModel.deleteUser(user.id);
                   Navigator.pop(context, 'Delete');
                 },
                 child: const Text('DELETE'),
