@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
-
 import '../../../session_manager.dart';
 import '../../components/search_bar.dart';
 import '../admin/buses/bus_management.dart';
@@ -9,17 +8,27 @@ import '../admin/user/user_managment_screen.dart';
 import '../employee/employee_space.dart';
 
 class QuickAccess extends StatefulWidget {
+  late final bool hasUnreadNotification;
+
+  QuickAccess({required this.hasUnreadNotification});
   @override
   State<QuickAccess> createState() => _QuickAccessState();
 }
 
-class _QuickAccessState extends State<QuickAccess>   {
+class _QuickAccessState extends State<QuickAccess> {
   String? role;
   @override
   void initState() {
     super.initState();
     //setUserRole();
     role = SessionManager.Role;
+  }
+
+  void onNotificationIconClicked() {
+    setState(() {
+      widget.hasUnreadNotification = false; // Reset the notification state
+    });
+    // Navigate to your notifications page or handle the click event
   }
 
   @override
@@ -41,17 +50,31 @@ class _QuickAccessState extends State<QuickAccess>   {
                 Text('Hi, john doe !',
                     style: Theme.of(context).textTheme.headlineMedium),
                 const Spacer(),
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const BusManagement()),
-                    );
-                  },
-                  icon: const Icon(Icons.notifications),
-                  color: AppColors.primaryOrange,
-                  iconSize: 30.0,
+                Stack(
+                  children: [
+                    IconButton(
+                      onPressed: onNotificationIconClicked,
+                      icon: const Icon(Icons.notifications),
+                      color: AppColors.primaryOrange,
+                      iconSize: 30.0,
+                    ),
+                    if (widget.hasUnreadNotification)
+                      Positioned(
+                        right: 11,
+                        top: 13,
+                        child: Container(
+                          padding: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            color: Color.fromARGB(255, 250, 178, 145),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 10,
+                            minHeight: 10,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),

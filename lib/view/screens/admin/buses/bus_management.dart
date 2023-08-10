@@ -53,7 +53,7 @@ class _BusManagementState extends State<BusManagement>  {
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           var bus = snapshot.data![index];
-                          return BusCard(bus: bus , isdriver: isdriver!,);
+                          return BusCard(bus: bus );
                         },
                       ),
                     ),

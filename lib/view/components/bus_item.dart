@@ -4,19 +4,20 @@ import 'package:septeo_transport/constatns.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 
 import '../../model/bus.dart';
+import '../../session_manager.dart';
 import '../../viewmodel/bus_services.dart';
 import '../../viewmodel/user_services.dart';
 import '../screens/admin/buses/bus_details.dart';
 
 class BusCard extends StatelessWidget {
   final Bus bus;
-  final bool isdriver;
+  String  role = SessionManager.Role;
 
-  const BusCard({super.key, required this.bus, required this.isdriver});
+   BusCard({super.key, required this.bus});
 
   @override
   Widget build(BuildContext context) {
-    return isdriver ? buildCard(context) : buildDismissibleCard(context);
+    return role=="Driver" ? buildCard(context) : buildDismissibleCard(context);
   }
 
   Widget buildDismissibleCard(BuildContext context) {
@@ -87,7 +88,7 @@ class BusCard extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (isdriver)
+            if (role=="Driver")
               IconButton(
                 icon: const Icon(Icons.message),
                 onPressed: () {
@@ -125,7 +126,7 @@ class BusCard extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => BusDetailsScreen(
                       bus: bus,
-                      isdriver: isdriver,
+                      isdriver: role=="Driver",
                     ),
                   ),
                 );

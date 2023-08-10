@@ -7,13 +7,14 @@ class SessionManager {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("userId", id);
     userId = id;
+    
   }
 
-  static Future<void> getUserId() async {
+  static Future<String> getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    userId= prefs.getString("userId") ?? "";
-   // return prefs.getString("userId") ?? "";
-  }
+    userId = prefs.getString("userId") ?? "";
+    return userId;
+}
 
   static Future<void> clearSession() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

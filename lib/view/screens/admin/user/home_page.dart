@@ -25,6 +25,7 @@ class HomeState extends State<Home> {
     List<IconData> listOfIcons = [];
 
   List<String> listOfStrings = [];
+   bool hasUnreadNotification = false;
   @override
   void initState() {
     super.initState();
@@ -66,7 +67,7 @@ class HomeState extends State<Home> {
                 index: currentIndex,
                 children: role == "Driver"
                     ? [const BusManagement(), const SettingsPage()]
-                    : [QuickAccess(), const HomePage(), const SettingsPage()]),
+                    : [QuickAccess(hasUnreadNotification: hasUnreadNotification ), const HomePage(), const SettingsPage()]),
             Positioned(
               left: 0,
               right: 0,

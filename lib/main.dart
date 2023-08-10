@@ -14,6 +14,7 @@ import 'package:uni_links/uni_links.dart';
 import 'view/screens/splash_screen.dart';
 
 void main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -37,15 +38,13 @@ void main() async {
   runApp(
     ChangeNotifierProvider<UserViewModel>.value(
       value: userViewModel,
-      child: MyApp(userId: SessionManager.userId),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
-  final String? userId;
-
-  const MyApp({Key? key, this.userId}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -55,6 +54,9 @@ class _MyAppState extends State<MyApp> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+      bool hasUnreadNotification = false; 
+        String? userId;
 
   Future<void> _showNotification(String title, String body) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
@@ -72,11 +74,14 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+     _initializeUserId();
     initUniLinks();
 
     _firebaseMessaging.getToken().then((String? token) {
       assert(token != null);
+      //print("FCM Token: $token");
     });
+    
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
@@ -86,7 +91,10 @@ class _MyAppState extends State<MyApp> {
         _showNotification(
             notification.title ?? "new message for your bus driver",
             notification.body ??
-                ""); // Show a local notification when a push notification is received
+                ""); 
+                setState(() {
+      hasUnreadNotification = true; 
+    });
       }
     });
     Future.delayed(Duration.zero, () {
@@ -95,6 +103,13 @@ class _MyAppState extends State<MyApp> {
       }
     });
   }
+Future<void> _initializeUserId() async {
+    String userId = await SessionManager.getUserId();
+    setState(() {
+        userId = userId;
+    });
+}
+ 
 
   Future<void> initUniLinks() async {
     // Get the initial deep link if the app was launched with one
@@ -153,7 +168,7 @@ class _MyAppState extends State<MyApp> {
           case '/splash':
             return MaterialPageRoute(
                 builder: (context) => SplashScreen(
-                      nextRoute: widget.userId == "" || widget.userId!.isEmpty
+                      nextRoute: userId == ""
                           ? '/'
                           : '/home',
                     ));

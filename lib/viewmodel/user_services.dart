@@ -20,31 +20,31 @@ class UserViewModel extends ChangeNotifier {
 
   Future<void> initUserId() async {
     userId = SessionManager.userId;
-    notifyListeners(); 
+    notifyListeners();
   }
 
   // Login method
-   Future<void> login(
-      String email, String password, String regestrationtoken, BuildContext context ) async {
-    Map<String, dynamic> userdata = {"email": email, "password": password , "registrationToken" : regestrationtoken};
+  Future<void> login(String email, String password, String regestrationtoken,
+      BuildContext context) async {
+    Map<String, dynamic> userdata = {
+      "email": email,
+      "password": password,
+      "registrationToken": regestrationtoken
+    };
 
     final response = await ApiService.post("/login", userdata);
 
     Map<String, dynamic> userData = json.decode(response.body);
-    
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("token", userData["token"]);
 
-    
-
     String token = prefs.getString("token") ?? "";
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     await SessionManager.saveUserId(decodedToken["id"]);
-     context.read<UserViewModel>().userId = decodedToken["id"];
-     await SessionManager.saveRole(decodedToken["role"]);
-     
-
+    String userId = await SessionManager.getUserId();
+    context.read<UserViewModel>().userId = userId;
+    await SessionManager.saveRole(decodedToken["role"]);
 
     Role role;
     switch (decodedToken['role']) {
@@ -62,17 +62,17 @@ class UserViewModel extends ChangeNotifier {
         break;
     }
 
-    Navigator.pushReplacementNamed(context, '/home' , arguments: role);
+    Navigator.pushReplacementNamed(context, '/home', arguments: role);
   }
 
-   Future<List<User>> getDrivers() async {
+  Future<List<User>> getDrivers() async {
     final response = await ApiService.get("/drivers");
 
     List jsonResponse = json.decode(response.body);
     return jsonResponse.map((item) => User.fromJson(item)).toList();
   }
 
-    Future<Planning> getPlanning() async {
+  Future<Planning> getPlanning() async {
     if (userId == null || userId!.isEmpty) {
       throw Exception('User is not logged in');
     }
@@ -86,7 +86,7 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-   Future<List<Planning>> getPlannings() async {
+  Future<List<Planning>> getPlannings() async {
     await initUserId();
     if (userId == null || userId!.isEmpty) {
       throw Exception('User is not logged in');
@@ -101,7 +101,7 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-   Future<Planning> addPlanning(
+  Future<Planning> addPlanning(
     String user,
     String date,
     String fromStation,
@@ -130,9 +130,8 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-   Future<List<Planning>> fetchPlannings(
-      String user, DateTime date) async {
-        await initUserId();
+  Future<List<Planning>> fetchPlannings(String user, DateTime date) async {
+    await initUserId();
     if (userId == null || userId!.isEmpty) {
       throw Exception('User is not logged in');
     }
@@ -150,7 +149,7 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-   Future<void> deletePlanning(String id) async {
+  Future<void> deletePlanning(String id) async {
     final response = await ApiService.delete('planning/$id');
 
     if (response.statusCode == 200) {
@@ -162,7 +161,7 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-   Future<bool> updatePlanning(
+  Future<bool> updatePlanning(
     String id,
     String date,
     String fromStationId,
@@ -184,7 +183,7 @@ class UserViewModel extends ChangeNotifier {
     return response.statusCode == 200;
   }
 
-   Future<Planning?> getTodayPlanning() async {
+  Future<Planning?> getTodayPlanning() async {
     await initUserId();
     if (userId == null || userId!.isEmpty) {
       throw Exception('User is not logged in');
@@ -201,7 +200,7 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-   Future<List<User>> getUsers() async {
+  Future<List<User>> getUsers() async {
     final response = await ApiService.get('/users');
 
     if (response.statusCode == 200) {
@@ -226,7 +225,7 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-   Future<User> createUser(
+  Future<User> createUser(
       String email, String password, String username, String role) async {
     final Map<String, String> body = {
       'email': email,
@@ -244,7 +243,7 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-   Future<void> deleteUser(String id) async {
+  Future<void> deleteUser(String id) async {
     final response = await ApiService.delete('/user/$id');
 
     if (response.statusCode != 200) {
@@ -252,7 +251,7 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-   Future<User> updateUser(String id, String email, String password,
+  Future<User> updateUser(String id, String email, String password,
       String username, String role) async {
     final Map<String, String?> body = {
       'email': email,
@@ -270,7 +269,7 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-   Future<void> sendMessage(String busId, String message) async {
+  Future<void> sendMessage(String busId, String message) async {
     Map<String, dynamic> messageData = {"busId": busId, "message": message};
 
     final response = await ApiService.post("/message", messageData);

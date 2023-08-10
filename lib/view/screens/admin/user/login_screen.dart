@@ -98,6 +98,7 @@ class LoginPageState extends State<LoginPage> {
 
           // Get the registration token
           String? token = await FirebaseMessaging.instance.getToken();
+          print("FCM Token: $token");
 
           await userViewModel.login(email, password, token!, context);
         }
