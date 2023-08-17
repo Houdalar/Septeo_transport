@@ -17,9 +17,25 @@ class _AdminSpaceState extends State<AdminSpace> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              "Admin Space",
+              style: TextStyle(color: AppColors.primaryDarkBlue),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.primaryDarkBlue),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+            ),
         body: Stack(
           children: [
-            _selectedIndex == 0 ? const StationManagement() : const BusManagement(),
+            _selectedIndex == 0
+                ? const StationManagement()
+                : const BusManagement(),
             Positioned(
               top: 10.0,
               left: 30,

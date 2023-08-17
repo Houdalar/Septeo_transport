@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../constatns.dart';
+import '../model/notification.dart';
 import '../model/user.dart';
 import '../session_manager.dart';
 
@@ -20,7 +21,6 @@ class UserViewModel extends ChangeNotifier {
 
   Future<void> initUserId() async {
     userId = SessionManager.userId;
-    notifyListeners();
   }
 
   // Login method
@@ -102,7 +102,6 @@ class UserViewModel extends ChangeNotifier {
   }
 
   Future<Planning> addPlanning(
-    String user,
     String date,
     String fromStation,
     String toStation,
@@ -111,7 +110,7 @@ class UserViewModel extends ChangeNotifier {
     BuildContext context,
   ) async {
     Map<String, dynamic> planningData = {
-      "user": user,
+      "user": userId,
       "date": date,
       "isTakingBus": "true",
       "fromStation": fromStation,
@@ -276,6 +275,17 @@ class UserViewModel extends ChangeNotifier {
 
     if (response.statusCode != 200) {
       print('Failed to send message: ${response.statusCode}');
+    }
+  }
+
+  Future<List<notification>> fetchNotifications() async {
+    await initUserId();
+    final response = await ApiService.get("/notifications/$userId");
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => notification.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load notifications');
     }
   }
 }

@@ -102,13 +102,12 @@ class _AddPlanningFormState extends State<AddPlanningForm> {
       );
       return;
     }
-    String id = "64abf65cc2ce4294ccd8ae28"; // Replace with the actual userId
+
 
     if (widget.planning == null) {
       // In add mode, add the planning
       
       await userViewModel.addPlanning(
-          id,
           widget.selectedDate!.toIso8601String(),
           _selectedFromStation!.id,
           _selectedToStation!.id,

@@ -1,6 +1,12 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
+import 'package:septeo_transport/viewmodel/user_services.dart';
+import '../../../model/notification.dart';
 import '../../../session_manager.dart';
+import '../../components/notification_item.dart';
 import '../../components/search_bar.dart';
 import '../admin/buses/bus_management.dart';
 import '../admin/user/admin_screen.dart';
@@ -8,28 +14,92 @@ import '../admin/user/user_managment_screen.dart';
 import '../employee/employee_space.dart';
 
 class QuickAccess extends StatefulWidget {
-  late final bool hasUnreadNotification;
+   
 
-  QuickAccess({required this.hasUnreadNotification});
+  const QuickAccess({
+    super.key,
+    
+  });
   @override
   State<QuickAccess> createState() => _QuickAccessState();
 }
 
 class _QuickAccessState extends State<QuickAccess> {
   String? role;
+  bool hasUnreadNotification =false;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+    Future<void> _showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails('your channel id', 'your channel name',
+            importance: Importance.max,
+            priority: Priority.high,
+            showWhen: false);
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin
+        .show(0, title, body, platformChannelSpecifics, payload: '/AppHome');
+  }
   @override
   void initState() {
     super.initState();
     //setUserRole();
     role = SessionManager.Role;
+     print("QuickAccess screen hasUnreadNotification: ${hasUnreadNotification}");
+     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+
+      if (notification != null && android != null) {
+        _showNotification(
+            notification.title ?? "new message for your bus driver",
+            notification.body ?? "");
+      }
+      setState(() {
+        hasUnreadNotification = true;
+      });
+      print("main screenhasUnreadNotification: $hasUnreadNotification");
+    });
   }
 
   void onNotificationIconClicked() {
     setState(() {
-      widget.hasUnreadNotification = false; // Reset the notification state
+      hasUnreadNotification = false; 
     });
-    // Navigate to your notifications page or handle the click event
+    showNotificationsDialog(context);
+
   }
+
+  Future<void> showNotificationsDialog(BuildContext context) async {
+     final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+  List<notification> notifications = await userViewModel.fetchNotifications();
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Notifications'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            itemCount: notifications.length,
+            itemBuilder: (context, index) {
+              return NotificationItem( notif: notifications[index]);
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +128,7 @@ class _QuickAccessState extends State<QuickAccess> {
                       color: AppColors.primaryOrange,
                       iconSize: 30.0,
                     ),
-                    if (widget.hasUnreadNotification)
+                    if (hasUnreadNotification)
                       Positioned(
                         right: 11,
                         top: 13,

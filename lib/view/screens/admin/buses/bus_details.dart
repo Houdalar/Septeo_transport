@@ -100,24 +100,54 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                         } else {
                           Set<Polyline> polylines = polylineSnapshot.data!;
 
-                          return GoogleMap(
-                            cameraTargetBounds: CameraTargetBounds.unbounded,
-                            mapType: MapType.normal,
-                            onMapCreated: _onMapCreated,
-                            initialCameraPosition: CameraPosition(
-                              target: LatLng(
-                                  stations.isNotEmpty
-                                      ? stations[0].location.lat
-                                      : _center.latitude,
-                                  stations.isNotEmpty
-                                      ? stations[0].location.lng
-                                      : _center.longitude),
-                              zoom: 13.0,
-                            ),
-                            markers: markers,
-                            polylines: snapshot.data!.isEmpty
-                                ? Set<Polyline>()
-                                : polylines,
+                          return Stack(
+                            children: [
+                              GoogleMap(
+                                cameraTargetBounds:
+                                    CameraTargetBounds.unbounded,
+                                mapType: MapType.normal,
+                                onMapCreated: _onMapCreated,
+                                initialCameraPosition: CameraPosition(
+                                  target: LatLng(
+                                      stations.isNotEmpty
+                                          ? stations[0].location.lat
+                                          : _center.latitude,
+                                      stations.isNotEmpty
+                                          ? stations[0].location.lng
+                                          : _center.longitude),
+                                  zoom: 13.0,
+                                ),
+                                markers: markers,
+                                polylines: snapshot.data!.isEmpty
+                                    ? Set<Polyline>()
+                                    : polylines,
+                              ),
+                              Positioned(
+                                top: 10,
+                                left: 10,
+                                child: Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.arrow_back_ios,
+                                        color: AppColors.primaryOrange,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    Text(
+                                      "Bus ${widget.bus.busNumber}",
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryOrange,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           );
                         }
                       });

@@ -6,7 +6,9 @@ import 'package:septeo_transport/constatns.dart';
 import '../../../model/bus.dart';
 import '../../../model/planning.dart';
 import '../../../model/station.dart';
+import '../../../session_manager.dart';
 import '../../../viewmodel/user_services.dart';
+import '../../components/app_colors.dart';
 import '../../components/mini_calendar.dart';
 import '../../components/today_card.dart';
 
@@ -30,13 +32,14 @@ class _EmployeeSpaceState extends State<EmployeeSpace> {
   void initState() {
     super.initState();
     fetchWeekPlanning();
+    print(SessionManager.userId);
   }
 
   Future<void> fetchWeekPlanning() async {
     try {
+      String userId = await SessionManager.getUserId();
       final userViewModel = Provider.of<UserViewModel>(context, listen: false);
-      var planning = await userViewModel.fetchPlannings(
-          "64c8d38c55578bd4fbad84db", _selectedWeek);
+      var planning = await userViewModel.fetchPlannings(userId, _selectedWeek);
       setState(() {
         weekPlannings = planning;
         filterPlannings(_selectedDate);
@@ -65,6 +68,24 @@ class _EmployeeSpaceState extends State<EmployeeSpace> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              'bus schedule',
+              style: TextStyle(
+                color: AppColors.primaryDarkBlue,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back,
+                  color: AppColors.primaryDarkBlue),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(10.0),

@@ -11,10 +11,8 @@ import 'home_screen.dart';
 import 'settings_page.dart';
 
 class Home extends StatefulWidget {
-  final bool hasUnreadNotification ;
   const Home({
     super.key,
-    required this.hasUnreadNotification,
   });
 
   @override
@@ -24,7 +22,7 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> {
   var currentIndex = 0;
   String? role;
-    List<IconData> listOfIcons = [];
+  List<IconData> listOfIcons = [];
 
   List<String> listOfStrings = [];
   @override
@@ -32,35 +30,32 @@ class HomeState extends State<Home> {
     super.initState();
     //_initializeRole();
     role = SessionManager.Role;
-     if (role == "Driver") {
-        listOfIcons = [
-          Icons.directions_bus,
-          Icons.settings_rounded,
-        ];
-        listOfStrings = [
-          'driver',
-          'Settings',
-        ];
-      } else {
-        listOfIcons = [
-          Icons.home_rounded,
-          Icons.work_outline,
-          Icons.settings_rounded,
-        ];
-        listOfStrings = [
-          'Home',
-          'transport',
-          'Settings',
-        ];
-      }
+    if (role == "Driver") {
+      listOfIcons = [
+        Icons.directions_bus,
+        Icons.settings_rounded,
+      ];
+      listOfStrings = [
+        'driver',
+        'Settings',
+      ];
+    } else {
+      listOfIcons = [
+        Icons.home_rounded,
+        Icons.work_outline,
+        Icons.settings_rounded,
+      ];
+      listOfStrings = [
+        'Home',
+        'transport',
+        'Settings',
+      ];
+    }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     double displayWidth = MediaQuery.of(context).size.width;
-    bool hasUnreadNotification = false;
     return SafeArea(
       child: Scaffold(
         body: Stack(
@@ -69,7 +64,7 @@ class HomeState extends State<Home> {
                 index: currentIndex,
                 children: role == "Driver"
                     ? [const BusManagement(), const SettingsPage()]
-                    : [QuickAccess(hasUnreadNotification: hasUnreadNotification ), const HomePage(), const SettingsPage()]),
+                    : [const QuickAccess(), const HomePage(), const SettingsPage()]),
             Positioned(
               left: 0,
               right: 0,

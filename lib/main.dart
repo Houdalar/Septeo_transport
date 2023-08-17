@@ -14,7 +14,6 @@ import 'package:uni_links/uni_links.dart';
 import 'view/screens/splash_screen.dart';
 
 void main() async {
-  
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -55,48 +54,17 @@ class _MyAppState extends State<MyApp> {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-      bool hasUnreadNotification = false; 
-        String? userId;
-
-  Future<void> _showNotification(String title, String body) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails('your channel id', 'your channel name',
-            importance: Importance.max,
-            priority: Priority.high,
-            showWhen: false);
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin
-        .show(0, title, body, platformChannelSpecifics, payload: '/AppHome');
-  }
-
+  bool hasUnreadNotification = false;
+  String? userId;
   String? _deepLink;
   @override
   void initState() {
     super.initState();
-     _initializeUserId();
+    _initializeUserId();
     initUniLinks();
 
     _firebaseMessaging.getToken().then((String? token) {
       assert(token != null);
-      //print("FCM Token: $token");
-    });
-    
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
-
-      if (notification != null && android != null) {
-        _showNotification(
-            notification.title ?? "new message for your bus driver",
-            notification.body ??
-                ""); 
-                
-      }
-      setState(() {
-      hasUnreadNotification = true; 
-    });
     });
     Future.delayed(Duration.zero, () {
       if (_deepLink != null) {
@@ -104,13 +72,13 @@ class _MyAppState extends State<MyApp> {
       }
     });
   }
-Future<void> _initializeUserId() async {
+
+  Future<void> _initializeUserId() async {
     String userId = await SessionManager.getUserId();
     setState(() {
-        userId = userId;
+      userId = userId;
     });
-}
- 
+  }
 
   Future<void> initUniLinks() async {
     // Get the initial deep link if the app was launched with one
@@ -120,12 +88,12 @@ Future<void> _initializeUserId() async {
         Navigator.of(context).pushNamed(_deepLink!);
       }
     } catch (e) {
-      // Handle error
+      throw e;
     }
 
     // Listen for deep links while the app is running
+    // ignore: deprecated_member_use
     getLinksStream().listen((String? link) {
-      print('Link: $link'); // Add this line
       if (link != null) {
         Future.delayed(Duration.zero, () {
           Navigator.of(context).pushNamed(link);
@@ -165,13 +133,11 @@ Future<void> _initializeUserId() async {
           case '/':
             return MaterialPageRoute(builder: (context) => const LoginPage());
           case '/home':
-            return MaterialPageRoute(builder: (context) =>  Home(hasUnreadNotification: hasUnreadNotification));
+            return MaterialPageRoute(builder: (context) => const Home());
           case '/splash':
             return MaterialPageRoute(
                 builder: (context) => SplashScreen(
-                      nextRoute: userId == ""
-                          ? '/'
-                          : '/home',
+                      nextRoute: userId == "" ? '/' : '/home',
                     ));
           default:
             return null;

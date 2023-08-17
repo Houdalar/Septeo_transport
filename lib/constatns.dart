@@ -48,7 +48,7 @@ class ApiService {
 
   static void _handleError(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Failed with status code: ${response.statusCode}');
+      throw Exception('Failed with status code: ${response.statusCode} ${response.body}}');
     }
   }
 }
