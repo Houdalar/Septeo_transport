@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import '../../../../session_manager.dart';
 import '../../../components/app_colors.dart';
 import '../../appHome/quick_access.dart';
-import '../../employee/employee_space.dart';
 import '../buses/bus_management.dart';
-import 'admin_screen.dart';
 import 'home_screen.dart';
 import 'settings_page.dart';
 
@@ -28,30 +25,39 @@ class HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    //_initializeRole();
-    role = SessionManager.Role;
-    if (role == "Driver") {
-      listOfIcons = [
-        Icons.directions_bus,
-        Icons.settings_rounded,
-      ];
-      listOfStrings = [
-        'driver',
-        'Settings',
-      ];
-    } else {
-      listOfIcons = [
-        Icons.home_rounded,
-        Icons.work_outline,
-        Icons.settings_rounded,
-      ];
-      listOfStrings = [
-        'Home',
-        'transport',
-        'Settings',
-      ];
-    }
+    _initializeRole().then((fetchedRole) {
+      setState(() {
+        role = fetchedRole;
+        if (role == "Driver") {
+          listOfIcons = [
+            Icons.directions_bus,
+            Icons.settings,
+          ];
+          listOfStrings = [
+            "Bus",
+            "Settings",
+          ];
+        } else {
+          listOfIcons = [
+            Icons.access_time,
+            Icons.home,
+            Icons.settings,
+          ];
+          listOfStrings = [
+            "Quick Access",
+            "Home",
+            "Settings",
+          ];
+        }
+      });
+    });
+   
   }
+
+Future<String> _initializeRole() async {
+    String fetchedRole = await SessionManager.getRole();
+    return fetchedRole;
+}
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +90,7 @@ class HomeState extends State<Home> {
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: ListView.builder(
-                  itemCount: role == "Driver" ? 2 : 3,
+                  itemCount: listOfIcons.length,
                   scrollDirection: Axis.horizontal,
                   padding: EdgeInsets.symmetric(horizontal: displayWidth * .02),
                   itemBuilder: (context, index) => InkWell(

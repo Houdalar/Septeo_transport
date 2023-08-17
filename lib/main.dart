@@ -10,30 +10,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'view/screens/admin/user/login_screen.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:uni_links/uni_links.dart';
-
 import 'view/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  // Request notification permissions for iOS
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
   );
-
   await FlutterLocalNotificationsPlugin().initialize(initializationSettings);
   final UserViewModel userViewModel = UserViewModel();
-
   runApp(
     ChangeNotifierProvider<UserViewModel>.value(
       value: userViewModel,
@@ -71,14 +59,19 @@ class _MyAppState extends State<MyApp> {
         Navigator.of(context).pushNamed(_deepLink!);
       }
     });
+
+    print("userId $userId");
+    print("Role ${SessionManager.Role}");
   }
 
   Future<void> _initializeUserId() async {
-    String userId = await SessionManager.getUserId();
+    print("Initializing User ID...");
+    String fetchedUserId = await SessionManager.getUserId();
+    print("Fetched User ID: $fetchedUserId");
     setState(() {
-      userId = userId;
+      userId = fetchedUserId;
     });
-  }
+}
 
   Future<void> initUniLinks() async {
     // Get the initial deep link if the app was launched with one

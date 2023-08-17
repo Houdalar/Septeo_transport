@@ -19,8 +19,15 @@ class _BusManagementState extends State<BusManagement>  {
 @override
   void initState() {
     super.initState();
-    isdriver = SessionManager.Role == "driver" ? true : false;
+    _initializeRole();
   }
+  Future<void> _initializeRole() async {
+    String role = await SessionManager.getRole();
+    setState(() {
+        isdriver = role == "Driver";
+    });
+    print("isdriver $isdriver");
+}
   @override
   Widget build(BuildContext context) {
     if (isdriver == null) {

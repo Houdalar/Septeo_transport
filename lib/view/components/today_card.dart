@@ -16,17 +16,17 @@ class PlanningCard extends StatelessWidget {
     // Get the arrival time for the chosen bus
     String firstarrivalTime = 'No Arrival Time';
     String secondarrivalTime = 'empty';
-    for (var arrival in planning.fromStation?.arrivalTimes ?? []) {
-      if (arrival.bus?.id == planning.startbus?.id) {
+    for (var arrival in planning.fromStation.arrivalTimes ) {
+      if (arrival.bus?.id == planning.startbus.id) {
         firstarrivalTime = arrival.time ?? firstarrivalTime;
         break;
       }
     }
-    for (var arrival in planning.toStation?.arrivalTimes ?? []) {
-      if (arrival.bus?.id == planning.finishbus?.id) {
+    for (var arrival in planning.toStation.arrivalTimes ) {
+      if (arrival.bus?.id == planning.finishbus.id) {
         if (arrival.time != null &&
-            int.parse(arrival.time.split(':')[0]) >= 17) {
-          secondarrivalTime = arrival.time;
+            int.parse(arrival.time!.split(':')[0]) >= 17) {
+          secondarrivalTime = arrival.time!;
           break;
         }
       }

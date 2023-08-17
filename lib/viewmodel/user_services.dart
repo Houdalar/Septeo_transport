@@ -45,6 +45,8 @@ class UserViewModel extends ChangeNotifier {
     String userId = await SessionManager.getUserId();
     context.read<UserViewModel>().userId = userId;
     await SessionManager.saveRole(decodedToken["role"]);
+String roleSaved =  SessionManager.Role;
+print("Saved Role: $roleSaved");
 
     Role role;
     switch (decodedToken['role']) {

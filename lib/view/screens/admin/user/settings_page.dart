@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../session_manager.dart';
 import '../../../components/app_colors.dart';
 import 'login_screen.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
-    Future<void> _logout(BuildContext context) async {
+Future<void> _logout(BuildContext context) async {
     // Clear shared preferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
 
+    // Clear SessionManager static variables
+    SessionManager.clearSession();
+
     // Navigate to login screen
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => LoginPage()), // Replace this with your login screen
+      MaterialPageRoute(builder: (context) => const LoginPage()), // Replace this with your login screen
       (Route<dynamic> route) => false,
     );
-  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +32,7 @@ class SettingsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Text(
@@ -39,7 +43,7 @@ class SettingsPage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Card(
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 shape: 

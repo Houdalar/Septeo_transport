@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionManager {
   static  String userId = "";
-  static  String Role = "Admin";
+  static  String Role = "";
   static Future<void> saveUserId(String id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("userId", id);
@@ -30,4 +30,9 @@ class SessionManager {
     Role = role;
   }
  
+ static Future<String> getRole() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Role = prefs.getString("Role") ?? "";
+    return Role;
+  }
 }
