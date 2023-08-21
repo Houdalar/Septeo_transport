@@ -25,7 +25,7 @@ class QuickAccess extends StatefulWidget {
 }
 
 class _QuickAccessState extends State<QuickAccess> {
-  String? role;
+  String? Role;
   bool hasUnreadNotification =false;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -40,16 +40,23 @@ class _QuickAccessState extends State<QuickAccess> {
     await flutterLocalNotificationsPlugin
         .show(0, title, body, platformChannelSpecifics, payload: '/AppHome');
   }
+
+   Future<String> _initializeRole() async {
+    return await SessionManager.getRole();
+    
+}
   @override
   void initState() {
     super.initState();
-    //setUserRole();
-    role = SessionManager.Role;
-     print("QuickAccess screen hasUnreadNotification: ${hasUnreadNotification}");
+    _initializeRole().then((fetchedRole) {
+      setState(() {
+        Role = fetchedRole;
+      });
+    
+    });
      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
-
       if (notification != null && android != null) {
         _showNotification(
             notification.title ?? "new message for your bus driver",
@@ -58,7 +65,6 @@ class _QuickAccessState extends State<QuickAccess> {
       setState(() {
         hasUnreadNotification = true;
       });
-      print("main screenhasUnreadNotification: $hasUnreadNotification");
     });
   }
 
@@ -103,7 +109,7 @@ class _QuickAccessState extends State<QuickAccess> {
 
   @override
   Widget build(BuildContext context) {
-    if (role == null) {
+    if (Role == null) {
       return const CircularProgressIndicator();
     }
     return SingleChildScrollView(
@@ -205,10 +211,10 @@ class _QuickAccessState extends State<QuickAccess> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: <Widget>[
-                if (role == "Admin")
+                if (Role == "Admin")
                   createQuickAccessCard(context, 'Transport Management',
                       'Bus driver-pana.png', const AdminSpace()),
-                if (role == "Admin")
+                if (Role == "Admin")
                   createQuickAccessCard(context, 'user Management',
                       'Office management-cuate.png', UserManagement()),
                 createQuickAccessCard(context, 'payment Management',

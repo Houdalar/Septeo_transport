@@ -14,13 +14,15 @@ import '../session_manager.dart';
 class UserViewModel extends ChangeNotifier {
   String? userId;
   List<Planning>? plannings;
+  final ApiService apiService;
+  final SessionManager sessionManager;
 
-  UserViewModel() {
+  UserViewModel({required this.apiService, required this.sessionManager}) {
     initUserId();
   }
 
   Future<void> initUserId() async {
-    userId = SessionManager.userId;
+    userId = await sessionManager.getUserId();
   }
 
   // Login method
@@ -32,21 +34,12 @@ class UserViewModel extends ChangeNotifier {
       "registrationToken": regestrationtoken
     };
 
-    final response = await ApiService.post("/login", userdata);
-
-    Map<String, dynamic> userData = json.decode(response.body);
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("token", userData["token"]);
-
-    String token = prefs.getString("token") ?? "";
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    await SessionManager.saveUserId(decodedToken["id"]);
-    String userId = await SessionManager.getUserId();
-    context.read<UserViewModel>().userId = userId;
-    await SessionManager.saveRole(decodedToken["role"]);
-String roleSaved =  SessionManager.Role;
-print("Saved Role: $roleSaved");
+    final response = await apiService.post("/login", userdata);
+    Map<String, dynamic> userData = response;
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(userData["token"]);
+    await sessionManager.saveUserId(decodedToken["id"]);
+    userId = await sessionManager.getUserId();
+    await sessionManager.saveRole(decodedToken["role"]);
 
     Role role;
     switch (decodedToken['role']) {
@@ -67,50 +60,44 @@ print("Saved Role: $roleSaved");
     Navigator.pushReplacementNamed(context, '/home', arguments: role);
   }
 
-  Future<List<User>> getDrivers() async {
-    final response = await ApiService.get("/drivers");
+   Future<List<User>> getDrivers() async {
+    final response = await apiService.get("/drivers");
 
-    List jsonResponse = json.decode(response.body);
+    List jsonResponse = response;
     return jsonResponse.map((item) => User.fromJson(item)).toList();
   }
+
 
   Future<Planning> getPlanning() async {
     if (userId == null || userId!.isEmpty) {
       throw Exception('User is not logged in');
     }
 
-    final response = await ApiService.get('/plannings/$userId');
+    final response = await apiService.get('/plannings/$userId');
 
-    if (response.statusCode == 200) {
-      return Planning.fromJson(json.decode(response.body));
-    } else {
-      throw Exception('Failed to load planning');
-    }
+    return Planning.fromJson(response);
   }
+
 
   Future<List<Planning>> getPlannings() async {
     await initUserId();
     if (userId == null || userId!.isEmpty) {
       throw Exception('User is not logged in');
     }
-    final response = await ApiService.get('/planning/$userId');
+    final response = await apiService.get('/planning/$userId');
 
-    if (response.statusCode == 200) {
-      List jsonResponse = json.decode(response.body);
-      return jsonResponse.map((item) => Planning.fromJson(item)).toList();
-    } else {
-      throw Exception('Failed to load plannings');
-    }
+    List jsonResponse = response;
+    return jsonResponse.map((item) => Planning.fromJson(item)).toList();
   }
 
-  Future<Planning> addPlanning(
-    String date,
-    String fromStation,
-    String toStation,
-    String startBus,
-    String finishBus,
-    BuildContext context,
-  ) async {
+
+  Future<Planning> addPlanning({
+    required String date,
+    required String fromStation,
+    required String toStation,
+    required String startBus,
+    required String finishBus,
+  }) async {
     Map<String, dynamic> planningData = {
       "user": userId,
       "date": date,
@@ -121,14 +108,8 @@ print("Saved Role: $roleSaved");
       "finishbus": finishBus,
     };
 
-    final response = await ApiService.post("/planning", planningData);
-
-    if (response.statusCode == 200) {
-      var responseBody = json.decode(response.body);
-      return Planning.fromJson(responseBody);
-    } else {
-      throw Exception('Failed to add planning');
-    }
+    final responseBody = await apiService.post("/planning", planningData);
+    return Planning.fromJson(responseBody);
   }
 
   Future<List<Planning>> fetchPlannings(String user, DateTime date) async {
@@ -138,38 +119,30 @@ print("Saved Role: $roleSaved");
     }
     final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
 
-    final response = await ApiService.get('/planning/$userId/$formattedDate');
+    final response = await apiService.get('/planning/$userId/$formattedDate');
 
-    if (response.statusCode == 200) {
-      Iterable jsonResponse = json.decode(response.body);
-      List<Planning> plannings = List<Planning>.from(
-          jsonResponse.map((model) => Planning.fromJson(model)));
-      return plannings;
+    if (response is List) {
+      return response.map((item) => Planning.fromJson(item)).toList();
     } else {
       throw Exception('Failed to load plannings');
     }
   }
 
-  Future<void> deletePlanning(String id) async {
-    final response = await ApiService.delete('planning/$id');
-
-    if (response.statusCode == 200) {
-      List<Planning> plannings = await getPlannings();
-      plannings.removeWhere((planning) => planning.id == id);
-      notifyListeners();
-    } else {
-      throw Exception('Failed to delete planning');
-    }
+ Future<void> deletePlanning(String id) async {
+    await apiService.delete('planning/$id');
+    List<Planning> plannings = await getPlannings();
+    plannings.removeWhere((planning) => planning.id == id);
+    notifyListeners();
   }
 
-  Future<bool> updatePlanning(
-    String id,
-    String date,
-    String fromStationId,
-    String toStationId,
-    String startBusId,
-    String finishBusId,
-  ) async {
+ Future<bool> updatePlanning({
+    required String id,
+    required String date,
+    required String fromStationId,
+    required String toStationId,
+    required String startBusId,
+    required String finishBusId,
+  }) async {
     final Map<String, String> body = {
       'id': id,
       'date': date,
@@ -179,37 +152,22 @@ print("Saved Role: $roleSaved");
       'finishbus': finishBusId,
     };
 
-    final response = await ApiService.put("/planning", body);
-
-    return response.statusCode == 200;
+    final responseBody = await apiService.put("/planning", body);
+    return responseBody != null;
   }
 
-  Future<Planning?> getTodayPlanning() async {
-    await initUserId();
+   Future<Planning?> getTodayPlanning() async {
     if (userId == null || userId!.isEmpty) {
       throw Exception('User is not logged in');
     }
 
-    final response = await ApiService.get('/todayplanning/$userId');
-    if (response.statusCode == 200) {
-      var jsonResponse = json.decode(response.body);
-      return Planning.fromJson(jsonResponse);
-    } else if (response.statusCode == 404) {
-      return null;
-    } else {
-      throw Exception('Failed to load planning');
-    }
+    final responseBody = await apiService.get('/todayplanning/$userId');
+    return Planning.fromJson(responseBody);
   }
 
   Future<List<User>> getUsers() async {
-    final response = await ApiService.get('/users');
-
-    if (response.statusCode == 200) {
-      List jsonResponse = json.decode(response.body);
-      return jsonResponse.map((data) => User.fromJson(data)).toList();
-    } else {
-      throw Exception('Failed to load users from API');
-    }
+    final responseBody = await apiService.get('/users');
+    return responseBody.map((data) => User.fromJson(data)).toList();
   }
 
   Future<User> getUser() async {
@@ -217,17 +175,16 @@ print("Saved Role: $roleSaved");
       throw Exception('User is not logged in');
     }
 
-    final response = await ApiService.get('/user/$userId');
-
-    if (response.statusCode == 200) {
-      return User.fromJson(json.decode(response.body));
-    } else {
-      throw Exception('Failed to load user from API');
-    }
+    final responseBody = await apiService.get('/user/$userId');
+    return User.fromJson(responseBody);
   }
 
-  Future<User> createUser(
-      String email, String password, String username, String role) async {
+ Future<User> createUser({
+    required String email,
+    required String password,
+    required String username,
+    required String role,
+  }) async {
     final Map<String, String> body = {
       'email': email,
       'password': password,
@@ -235,25 +192,21 @@ print("Saved Role: $roleSaved");
       'role': role,
     };
 
-    final response = await ApiService.post("/user", body);
-
-    if (response.statusCode == 201) {
-      return User.fromJson(json.decode(response.body));
-    } else {
-      throw Exception('Failed to create user.');
-    }
+    final responseBody = await apiService.post("/user", body);
+    return User.fromJson(responseBody);
   }
 
   Future<void> deleteUser(String id) async {
-    final response = await ApiService.delete('/user/$id');
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to delete user.');
-    }
+    await apiService.delete('/user/$id');
   }
 
-  Future<User> updateUser(String id, String email, String password,
-      String username, String role) async {
+  Future<User> updateUser({
+    required String id,
+    required String email,
+    required String password,
+    required String username,
+    required String role,
+  }) async {
     final Map<String, String?> body = {
       'email': email,
       'password': password,
@@ -261,33 +214,20 @@ print("Saved Role: $roleSaved");
       'role': role,
     };
 
-    final response = await ApiService.put("/user/$id", body);
-
-    if (response.statusCode == 200) {
-      return User.fromJson(json.decode(response.body));
-    } else {
-      throw Exception('Failed to update user.');
-    }
+    final responseBody = await apiService.put("/user/$id", body);
+    return User.fromJson(responseBody);
   }
 
-  Future<void> sendMessage(String busId, String message) async {
+  Future<void> sendMessage({
+    required String busId,
+    required String message,
+  }) async {
     Map<String, dynamic> messageData = {"busId": busId, "message": message};
-
-    final response = await ApiService.post("/message", messageData);
-
-    if (response.statusCode != 200) {
-      print('Failed to send message: ${response.statusCode}');
-    }
+    await apiService.post("/message", messageData);
   }
 
   Future<List<notification>> fetchNotifications() async {
-    await initUserId();
-    final response = await ApiService.get("/notifications/$userId");
-    if (response.statusCode == 200) {
-      List<dynamic> jsonResponse = json.decode(response.body);
-      return jsonResponse.map((data) => notification.fromJson(data)).toList();
-    } else {
-      throw Exception('Failed to load notifications');
-    }
+    final responseBody = await apiService.get("/notifications/$userId");
+    return responseBody.map((data) => notification.fromJson(data)).toList();
   }
 }

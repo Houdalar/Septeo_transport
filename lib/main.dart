@@ -4,6 +4,7 @@ import 'package:septeo_transport/view/components/app_colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:septeo_transport/viewmodel/user_services.dart';
+import 'constatns.dart';
 import 'session_manager.dart';
 import 'view/screens/admin/user/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,16 +16,28 @@ import 'view/screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-  const InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-  );
-  await FlutterLocalNotificationsPlugin().initialize(initializationSettings);
-  final UserViewModel userViewModel = UserViewModel();
+
   runApp(
-    ChangeNotifierProvider<UserViewModel>.value(
-      value: userViewModel,
+    MultiProvider(
+      providers: [
+        Provider(create: (context) => ApiService()), // Providing ApiService
+        Provider<Preferences>(create: (context) => SharedPreferencesImpl()), // Providing SharedPreferencesImpl as Preferences
+        Provider(create: (context) => SessionManager(prefs: context.read<Preferences>())), // Providing SessionManager with SharedPreferencesImpl
+        ChangeNotifierProvider(
+          create: (context) => UserViewModel(
+            apiService: context.read<ApiService>(),
+            sessionManager: context.read<SessionManager>(),
+          ),
+        ),
+       /* ChangeNotifierProvider(
+          create: (context) => StationServices(apiService: context.read<ApiService>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => BusServices(apiService: context.read<ApiService>()),
+        ),*/
+        Provider(create: (context) => FirebaseMessaging.instance),
+        Provider(create: (context) => FlutterLocalNotificationsPlugin()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -38,40 +51,35 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+ late final FirebaseMessaging _firebaseMessaging;
+  late final FlutterLocalNotificationsPlugin _notificationsPlugin;
+  late final UserViewModel _userViewModel;
+ // late final StationServices _stationServices;
+  //late final BusServices _busServices;
 
   bool hasUnreadNotification = false;
   String? userId;
   String? _deepLink;
+
   @override
   void initState() {
     super.initState();
+    _firebaseMessaging = context.read<FirebaseMessaging>();
+    _notificationsPlugin = context.read<FlutterLocalNotificationsPlugin>();
+    _userViewModel = context.read<UserViewModel>();
+   // _stationServices = context.read<StationServices>();
+   // _busServices = context.read<BusServices>();
+
     _initializeUserId();
     initUniLinks();
-
     _firebaseMessaging.getToken().then((String? token) {
       assert(token != null);
     });
-    Future.delayed(Duration.zero, () {
-      if (_deepLink != null) {
-        Navigator.of(context).pushNamed(_deepLink!);
-      }
-    });
-
-    print("userId $userId");
-    print("Role ${SessionManager.Role}");
   }
 
   Future<void> _initializeUserId() async {
-    print("Initializing User ID...");
-    String fetchedUserId = await SessionManager.getUserId();
-    print("Fetched User ID: $fetchedUserId");
-    setState(() {
-      userId = fetchedUserId;
-    });
-}
+    userId = await _userViewModel.initializeUserId();
+  }
 
   Future<void> initUniLinks() async {
     // Get the initial deep link if the app was launched with one

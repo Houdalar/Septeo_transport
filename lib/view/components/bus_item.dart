@@ -10,13 +10,15 @@ import '../screens/admin/buses/bus_details.dart';
 
 class BusCard extends StatelessWidget {
   final Bus bus;
-  String  role = SessionManager.Role;
+  String role = SessionManager.Role;
 
-   BusCard({super.key, required this.bus});
+  BusCard({super.key, required this.bus});
 
   @override
   Widget build(BuildContext context) {
-    return role=="Driver" ? buildCard(context) : buildDismissibleCard(context);
+    return role == "Driver"
+        ? buildCard(context)
+        : buildDismissibleCard(context);
   }
 
   Widget buildDismissibleCard(BuildContext context) {
@@ -71,35 +73,36 @@ class BusCard extends StatelessWidget {
 
   Widget buildCard(BuildContext context) {
     return Card(
-      elevation: 4.0,
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(40.0),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(15.0),
-        title: Text(
-          bus.busNumber,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18.0,
-          ),
-        ),
-        trailing: Row(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (role=="Driver")
+            Text(
+              bus.busNumber,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18.0,
+              ),
+            ),
+           const Spacer(),
+            if (role == "Driver")
               IconButton(
                 icon: const Icon(Icons.message),
                 onPressed: () {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      final TextEditingController _controller =
+                      final TextEditingController controller =
                           TextEditingController();
                       return AlertDialog(
                         title: const Text('Send Message'),
                         content: TextField(
-                          controller: _controller,
+                          controller: controller,
                           decoration: const InputDecoration(
                               hintText: "Enter your message here"),
                         ),
@@ -107,8 +110,11 @@ class BusCard extends StatelessWidget {
                           TextButton(
                             child: const Text('SEND'),
                             onPressed: () {
-                              final userViewModel = Provider.of<UserViewModel>(context, listen: false);
-                              userViewModel.sendMessage(bus.id, _controller.text);
+                              final userViewModel = Provider.of<UserViewModel>(
+                                  context,
+                                  listen: false);
+                              userViewModel.sendMessage(
+                                  bus.id, controller.text);
                               Navigator.of(context).pop();
                             },
                           ),
@@ -119,13 +125,13 @@ class BusCard extends StatelessWidget {
                 },
               ),
             IconButton(
-              icon: const Icon(Icons.arrow_forward_ios),
+              icon: const Icon(Icons.arrow_forward_ios , color: AppColors.primaryOrange,),
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => BusDetailsScreen(
                       bus: bus,
-                      isdriver: role=="Driver",
+                      isdriver: role == "Driver",
                     ),
                   ),
                 );

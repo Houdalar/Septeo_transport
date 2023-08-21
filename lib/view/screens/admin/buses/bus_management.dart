@@ -6,6 +6,7 @@ import 'package:septeo_transport/view/screens/admin/buses/add_bus_sheet.dart';
 import '../../../../model/bus.dart';
 import '../../../../viewmodel/bus_services.dart';
 import '../../../components/bus_item.dart';
+import '../../../components/search_bar.dart';
 
 class BusManagement extends StatefulWidget {
   const BusManagement({super.key,});
@@ -54,6 +55,10 @@ class _BusManagementState extends State<BusManagement>  {
                       const Text(" buses list",
                           style: TextStyle(
                               fontSize: 25, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    Search_bar(
+                      onChanged: (value) {},
+                    ),
                     const SizedBox(height: 20),
                     Expanded(
                       child: ListView.builder(

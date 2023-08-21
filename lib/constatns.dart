@@ -7,73 +7,74 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ApiService {
-  static const String baseUrl = "10.0.2.2:8080";
-  static const Map<String, String> headers = {
-    "Content-Type": "application/json; charset=UTF-8"
-  };
+  final String baseUrl;
+  final Map<String, String> headers;
 
-  static Future<http.Response> post(
-      String url, Map<String, dynamic> body) async {
+  ApiService({
+    this.baseUrl = "10.0.2.2:8080",
+    this.headers = const {
+      "Content-Type": "application/json; charset=UTF-8"
+    },
+  });
+
+  Future<dynamic> post(String url, Map<String, dynamic> body) async {
     final response = await http.post(
       Uri.http(baseUrl, url),
       headers: headers,
       body: json.encode(body),
     );
-    _handleError(response);
-    return response;
+    return _handleResponse(response);
   }
 
-  static Future<http.Response> get(String url) async {
+  Future<dynamic> get(String url) async {
     final response = await http.get(Uri.http(baseUrl, url));
-    _handleError(response);
-    return response;
+    return _handleResponse(response);
   }
 
-  static Future<http.Response> delete(String url) async {
+  Future<dynamic> delete(String url) async {
     final response = await http.delete(Uri.http(baseUrl, url));
-    _handleError(response);
-    return response;
+    return _handleResponse(response);
   }
 
-  static Future<http.Response> put(
-      String url, Map<String, dynamic> body) async {
+  Future<dynamic> put(String url, Map<String, dynamic> body) async {
     final response = await http.put(
       Uri.http(baseUrl, url),
       headers: headers,
       body: json.encode(body),
     );
-    _handleError(response);
-    return response;
+    return _handleResponse(response);
   }
 
-  static void _handleError(http.Response response) {
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Failed with status code: ${response.statusCode} ${response.body}}');
+  dynamic _handleResponse(http.Response response) {
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      var responseBody = json.decode(response.body);
+      if (responseBody is Map || responseBody is List) {
+        return responseBody;
+      } else {
+        throw ApiException(response.statusCode, "Unexpected response format");
+      }
+    } else {
+      throw ApiException(response.statusCode, response.body);
     }
   }
 }
 
-class ErrorHandler {
-  static void handleError(BuildContext context, int statusCode) {
-    String title = "Error";
-    String message = "Something went wrong. Please try again later.";
+class ApiException implements Exception {
+  final int statusCode;
+  final String responseBody;
 
-    switch (statusCode) {
-      case 200:
-        message = "Success";
-        break;
-      case 400:
-        message = "Wrong password.";
-        break;
-      case 401:
-        message =
-            "The email address is not associated with any account. Please check and try again.";
-        break;
-      // Add more cases here for other status codes
-      default:
-        message = "Something went wrong. Please try again later.";
-        break;
-    }
+  ApiException(this.statusCode, this.responseBody);
+
+  @override
+  String toString() {
+    return 'ApiException: $statusCode $responseBody';
+  }
+}
+
+class ErrorHandler {
+  static void handleError(BuildContext context, ApiException exception) {
+    String title = "Error";
+    String message = ErrorHandler.getMessage(exception.statusCode);
 
     showDialog(
         context: context,
@@ -84,5 +85,19 @@ class ErrorHandler {
               content: Text(message,
                   style: const TextStyle(color: AppColors.primaryTextColor)));
         });
+  }
+
+  static String getMessage(int statusCode) {
+    switch (statusCode) {
+      case 200:
+        return "Success";
+      case 400:
+        return "Wrong password.";
+      case 401:
+        return "The email address is not associated with any account. Please check and try again.";
+      // Add more cases here for other status codes
+      default:
+        return "Something went wrong. Please try again later.";
+    }
   }
 }

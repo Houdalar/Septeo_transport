@@ -1,12 +1,12 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:provider/provider.dart';
 import 'package:septeo_transport/viewmodel/user_services.dart';
 import '../../../components/app_colors.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  final UserViewModel userViewModel;
+  const LoginPage({Key? key, required this.userViewModel}) : super(key: key);
 
   @override
   LoginPageState createState() => LoginPageState();
@@ -15,12 +15,10 @@ class LoginPage extends StatefulWidget {
 class LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     final logo = Container(
       height: 150.0,
       width: double.infinity,
@@ -90,35 +88,6 @@ class LoginPageState extends State<LoginPage> {
       },
     );
 
-    final loginButton = ElevatedButton(
-      onPressed: () async {
-        if (_formKey.currentState!.validate()) {
-          String email = _emailController.text;
-          String password = _passwordController.text;
-
-          // Get the registration token
-          String? token = await FirebaseMessaging.instance.getToken();
-          print("FCM Token: $token");
-
-          await userViewModel.login(email, password, token!, context);
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryOrange,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        padding: const EdgeInsets.all(16.0),
-      ),
-      child: const Text(
-        'Log In',
-        style: TextStyle(
-          color: AppColors.auxiliaryOffWhite,
-          fontSize: 20.0,
-        ),
-      ),
-    );
-
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -151,7 +120,7 @@ class LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 30, vertical: 10),
-                    child: loginButton,
+                    child: _buildLoginButton(),
                   ),
                 ],
               ),
@@ -160,6 +129,7 @@ class LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  
   }
 
   @override
@@ -169,4 +139,35 @@ class LoginPageState extends State<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
+
+ Widget _buildLoginButton() {
+    return ElevatedButton(
+      onPressed: () async {
+        if (_formKey.currentState!.validate()) {
+          String email = _emailController.text;
+          String password = _passwordController.text;
+
+          // Get the registration token
+          String? token = await FirebaseMessaging.instance.getToken();
+          await widget.userViewModel.login(email, password, token!, context);
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primaryOrange,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(32.0),
+        ),
+        padding: const EdgeInsets.all(16.0),
+      ),
+      child: const Text(
+        'Log In',
+        style: TextStyle(
+          color: AppColors.auxiliaryOffWhite,
+          fontSize: 20.0,
+        ),
+      ),
+    );
+  }
 }
+
+

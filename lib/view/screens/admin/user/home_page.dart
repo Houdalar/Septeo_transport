@@ -30,24 +30,24 @@ class HomeState extends State<Home> {
         role = fetchedRole;
         if (role == "Driver") {
           listOfIcons = [
-            Icons.directions_bus,
-            Icons.settings,
-          ];
-          listOfStrings = [
-            "Bus",
-            "Settings",
-          ];
-        } else {
-          listOfIcons = [
-            Icons.access_time,
-            Icons.home,
-            Icons.settings,
-          ];
-          listOfStrings = [
-            "Quick Access",
-            "Home",
-            "Settings",
-          ];
+          Icons.directions_bus,
+          Icons.settings_rounded,
+        ];
+        listOfStrings = [
+          'driver',
+          'Settings',
+        ];
+      } else {
+        listOfIcons = [
+          Icons.home_rounded,
+          Icons.directions_bus,
+          Icons.settings_rounded,
+        ];
+        listOfStrings = [
+          'Home',
+          'transport',
+          'Settings',
+        ];
         }
       });
     });
