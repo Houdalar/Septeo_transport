@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -16,20 +17,25 @@ import 'view/screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
+  await dotenv.load();
   runApp(
     MultiProvider(
       providers: [
         Provider(create: (context) => ApiService()), // Providing ApiService
-        Provider<Preferences>(create: (context) => SharedPreferencesImpl()), // Providing SharedPreferencesImpl as Preferences
-        Provider(create: (context) => SessionManager(prefs: context.read<Preferences>())), // Providing SessionManager with SharedPreferencesImpl
+        Provider<Preferences>(
+            create: (context) =>
+                SharedPreferencesImpl()), // Providing SharedPreferencesImpl as Preferences
+        Provider(
+            create: (context) => SessionManager(
+                prefs: context.read<
+                    Preferences>())), // Providing SessionManager with SharedPreferencesImpl
         ChangeNotifierProvider(
           create: (context) => UserViewModel(
             apiService: context.read<ApiService>(),
             sessionManager: context.read<SessionManager>(),
           ),
         ),
-       /* ChangeNotifierProvider(
+        /* ChangeNotifierProvider(
           create: (context) => StationServices(apiService: context.read<ApiService>()),
         ),
         ChangeNotifierProvider(
@@ -51,10 +57,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
- late final FirebaseMessaging _firebaseMessaging;
+  late final FirebaseMessaging _firebaseMessaging;
   late final FlutterLocalNotificationsPlugin _notificationsPlugin;
   late final UserViewModel _userViewModel;
- // late final StationServices _stationServices;
+  // late final StationServices _stationServices;
   //late final BusServices _busServices;
 
   bool hasUnreadNotification = false;
@@ -67,8 +73,8 @@ class _MyAppState extends State<MyApp> {
     _firebaseMessaging = context.read<FirebaseMessaging>();
     _notificationsPlugin = context.read<FlutterLocalNotificationsPlugin>();
     _userViewModel = context.read<UserViewModel>();
-   // _stationServices = context.read<StationServices>();
-   // _busServices = context.read<BusServices>();
+    // _stationServices = context.read<StationServices>();
+    // _busServices = context.read<BusServices>();
 
     _initializeUserId();
     initUniLinks();
@@ -78,7 +84,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _initializeUserId() async {
-    userId = await _userViewModel.initializeUserId();
+    userId = await context.read<SessionManager>().getUserId();
   }
 
   Future<void> initUniLinks() async {
@@ -130,9 +136,13 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute: '/splash',
       onGenerateRoute: (settings) {
+        final userViewModel = context.read<UserViewModel>();
         switch (settings.name) {
           case '/':
-            return MaterialPageRoute(builder: (context) => const LoginPage());
+            return MaterialPageRoute(
+                builder: (context) => LoginPage(
+                      userViewModel: userViewModel,
+                    ));
           case '/home':
             return MaterialPageRoute(builder: (context) => const Home());
           case '/splash':
