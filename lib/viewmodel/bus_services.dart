@@ -7,6 +7,8 @@ import 'package:septeo_transport/model/bus.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 
+import '../constatns.dart';
+
 void requestLocationPermission() async {
   PermissionStatus permission = await Permission.location.status;
   if (!permission.isGranted) {
@@ -15,122 +17,54 @@ void requestLocationPermission() async {
 }
 
 class BusService extends ChangeNotifier {
-  //static String baseUrl = "10.0.2.2:8080";
-  static String baseUrl = "10.0.2.2:8080";
- // static String baseUrl = "192.168.250.165:8080"; // for real device
-  final List<Bus> _bus = [];
-  List<Bus> get bus {
-    return [..._bus];
-  }
+  final ApiService apiService;
 
-  BusService();
+  final List<Bus> _bus = [];
+  List<Bus> get bus => [..._bus];
+  BusService({required this.apiService});
 
 
 
   Future<List<Bus>> getBus() async {
-    final String url = 'http://$baseUrl/buses';
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      Iterable jsonResponse = jsonDecode(response.body);
-      print('Decoded response: $jsonResponse');
-      List<Bus> bus = List<Bus>.from(jsonResponse.map((model) => Bus.fromJson(model)));
-      return bus;
-    } else {
+    try {
+      final jsonResponse = await apiService.get('/buses');
+      return jsonResponse.map((model) => Bus.fromJson(model)).toList();
+    } catch (e) {
       throw Exception('Failed to load buses');
     }
   }
 
-  Future<void> createNewBus(int capacity, String busNumber,BuildContext context) async {
-    final response = await http.post(
-      Uri.parse('http://$baseUrl/bus'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
+  Future<void> createNewBus(int capacity, String busNumber, BuildContext context) async {
+    try {
+      await apiService.post('/bus', {
         'capacity': capacity,
         'busNumber': busNumber,
-      }),
-    );
-
-    if (response.statusCode == 201) {
-      Navigator.pop(context);
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Success'),
-              content: const Text('Bus created successfully.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          });
-    } else {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: const Text('Failed to create bus'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          });
+      });
+      apiService.showdialog(context, 'Success', 'Bus created successfully.');
+    } catch (e) {
+      apiService.showdialog(context, 'Error', 'Failed to create bus');
     }
   }
 
-   Future<void> deleteBus(String id, BuildContext context) async {
-    final response = await http.delete(
-      Uri.parse('http://$baseUrl/bus/$id'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-    // print(response.statusCode);
-
-    if (response.statusCode != 200) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: const Text('Failed to create bus'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          });
+  Future<void> deleteBus(String id, BuildContext context) async {
+    try {
+      await apiService.delete('/bus/$id');
+    } catch (e) {
+      apiService.showdialog(context, 'Error', 'Failed to delete bus');
     }
   }
 
-   static Future<bool> updateBus(String busId , int capacity , String busNumber)async {
-    final response = await http.put(
-      Uri.parse('http://$baseUrl/bus/$busId'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
+  Future<bool> updateBus(String busId, int capacity, String busNumber) async {
+    try {
+      await apiService.put('/bus/$busId', {
         'capacity': capacity,
         'busNumber': busNumber,
-      }),
-    );
-
-    if (response.statusCode == 201) {
+      });
       return true;
+    } catch (e) {
+      return false;
     }
-    
-    return false;
   }
 
+  
 }

@@ -13,6 +13,8 @@ import 'view/screens/admin/user/login_screen.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:uni_links/uni_links.dart';
 import 'view/screens/splash_screen.dart';
+import 'viewmodel/bus_services.dart';
+import 'viewmodel/station_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,12 +37,12 @@ void main() async {
             sessionManager: context.read<SessionManager>(),
           ),
         ),
-        /* ChangeNotifierProvider(
-          create: (context) => StationServices(apiService: context.read<ApiService>()),
+         ChangeNotifierProvider(
+          create: (context) => StationService(apiService: context.read<ApiService>()),
         ),
         ChangeNotifierProvider(
-          create: (context) => BusServices(apiService: context.read<ApiService>()),
-        ),*/
+          create: (context) => BusService(apiService: context.read<ApiService>()),
+        ),
         Provider(create: (context) => FirebaseMessaging.instance),
         Provider(create: (context) => FlutterLocalNotificationsPlugin()),
       ],
@@ -60,7 +62,7 @@ class _MyAppState extends State<MyApp> {
   late final FirebaseMessaging _firebaseMessaging;
   late final FlutterLocalNotificationsPlugin _notificationsPlugin;
   late final UserViewModel _userViewModel;
-  // late final StationServices _stationServices;
+  late final StationService _stationServices;
   //late final BusServices _busServices;
 
   bool hasUnreadNotification = false;
@@ -73,7 +75,7 @@ class _MyAppState extends State<MyApp> {
     _firebaseMessaging = context.read<FirebaseMessaging>();
     _notificationsPlugin = context.read<FlutterLocalNotificationsPlugin>();
     _userViewModel = context.read<UserViewModel>();
-    // _stationServices = context.read<StationServices>();
+     _stationServices = context.read<StationService>();
     // _busServices = context.read<BusServices>();
 
     _initializeUserId();

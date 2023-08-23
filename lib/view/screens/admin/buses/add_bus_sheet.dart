@@ -7,7 +7,14 @@ import '../../../../viewmodel/user_services.dart';
 import '../../../components/app_colors.dart';
 
 class AddBusSheet extends StatefulWidget {
-  const AddBusSheet({super.key});
+  final BusService busService;
+  final UserViewModel userViewModel;
+
+  const AddBusSheet({
+    Key? key,
+    required this.busService,
+    required this.userViewModel,
+  }) : super(key: key);
 
   @override
   _AddBusSheetState createState() => _AddBusSheetState();
@@ -17,12 +24,7 @@ class _AddBusSheetState extends State<AddBusSheet> {
   final _formKey = GlobalKey<FormState>();
   final _CapacityController = TextEditingController();
   final _busNumberController = TextEditingController();
-  final _driverController = TextEditingController();
-  final StationService stationService = StationService();
-  double? pickedLatitude;
-  double? pickedLongitude;
-  List<String> selectedStationIds = [];
-  final BusService busService = BusService();
+
   List<User> _drivers = []; // List of drivers
   String? _selectedDriver; // Selected driver
 
@@ -30,31 +32,29 @@ class _AddBusSheetState extends State<AddBusSheet> {
   void dispose() {
     _CapacityController.dispose();
     _busNumberController.dispose();
-    _driverController.dispose();
     super.dispose();
   }
- @override
+
+  @override
   void initState() {
     super.initState();
     fetchDrivers();
   }
 
   Future<void> fetchDrivers() async {
-    _drivers = await UserViewModel().getDrivers(); // assuming UserService().getDrivers() is implemented and it returns a List<User>
+    _drivers = await widget.userViewModel.getDrivers();
     if (_drivers.isNotEmpty) {
       _selectedDriver = _drivers[0].id;
     }
   }
+
   Future<void> createNewBus() async {
-    
-    busService.createNewBus(
-      
+    widget.busService.createNewBus(
       int.tryParse(_CapacityController.text) ?? 0,
       _busNumberController.text,
       context,
     );
   }
-
   @override
   Widget build(BuildContext context) {
     final CapacityField = TextFormField(

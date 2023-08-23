@@ -1,17 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 import 'package:septeo_transport/view/screens/admin/stations/station_management.dart';
 
+import '../../../../session_manager.dart';
+import '../../../../viewmodel/bus_services.dart';
+import '../../../../viewmodel/station_services.dart';
+import '../../../../viewmodel/user_services.dart';
 import '../buses/bus_management.dart';
 
 class AdminSpace extends StatefulWidget {
   const AdminSpace({Key? key}) : super(key: key);
+
   @override
   _AdminSpaceState createState() => _AdminSpaceState();
 }
 
 class _AdminSpaceState extends State<AdminSpace> {
   int _selectedIndex = 0;
+
+  late final BusService busService;
+  late final UserViewModel userService;
+  late final SessionManager sessionManager;
+  late final StationService stationService;
+
+   late final List<Widget> _tabs;
+
+  @override
+  void initState() {
+    super.initState();
+
+    busService = Provider.of<BusService>(context, listen: false);
+    userService = Provider.of<UserViewModel>(context, listen: false);
+    sessionManager = Provider.of<SessionManager>(context, listen: false);
+    stationService = Provider.of<StationService>(context, listen: false);
+    _tabs = [
+      const StationManagement(),
+      BusManagement(
+        busService: busService,
+        userService: userService,
+        sessionManager: sessionManager,
+        stationService: stationService,
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +65,7 @@ class _AdminSpaceState extends State<AdminSpace> {
             ),
         body: Stack(
           children: [
-            _selectedIndex == 0
-                ? const StationManagement()
-                : const BusManagement(),
+            _tabs[_selectedIndex],
             Positioned(
               top: 10.0,
               left: 30,

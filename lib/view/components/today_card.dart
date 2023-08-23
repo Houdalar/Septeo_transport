@@ -7,35 +7,43 @@ import '../screens/employee/add_planning.dart';
 
 class PlanningCard extends StatelessWidget {
   final Planning planning;
+  final UserViewModel userViewModel;
 
-  const PlanningCard({Key? key, required this.planning}) : super(key: key);
+  const PlanningCard({
+    Key? key,
+    required this.planning,
+    required this.userViewModel,
+  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    UserViewModel userViewModel = UserViewModel();
-    // Get the arrival time for the chosen bus
-    String firstarrivalTime = 'No Arrival Time';
-    String secondarrivalTime = 'empty';
-    for (var arrival in planning.fromStation.arrivalTimes ) {
+  String getFirstArrivalTime() {
+    for (var arrival in planning.fromStation.arrivalTimes) {
       if (arrival.bus?.id == planning.startbus.id) {
-        firstarrivalTime = arrival.time ?? firstarrivalTime;
-        break;
+        return arrival.time ?? 'No Arrival Time';
       }
     }
-    for (var arrival in planning.toStation.arrivalTimes ) {
+    return 'No Arrival Time';
+  }
+
+  String getSecondArrivalTime() {
+    for (var arrival in planning.toStation.arrivalTimes) {
       if (arrival.bus?.id == planning.finishbus.id) {
         if (arrival.time != null &&
             int.parse(arrival.time!.split(':')[0]) >= 17) {
-          secondarrivalTime = arrival.time!;
-          break;
+          return arrival.time!;
         }
       }
     }
+    return 'empty';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String firstarrivalTime = getFirstArrivalTime();
+    String secondarrivalTime = getSecondArrivalTime();
 
     return Material(
       child: InkWell(
         onLongPress: () {
-          // handle long press here by showing dialog
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -60,14 +68,13 @@ class PlanningCard extends StatelessWidget {
                   TextButton(
                     child: const Text('Update'),
                     onPressed: () {
-                       Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                       showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return AddPlanningForm(planning: planning );
-                      },
-                    );
-                     
+                        context: context,
+                        builder: (context) {
+                          return AddPlanningForm(planning: planning);
+                        },
+                      );
                     },
                   ),
                 ],

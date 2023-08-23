@@ -7,8 +7,13 @@ import 'app_colors.dart';
 
 class StationCard extends StatelessWidget {
   final Station station;
+  final StationService stationService;
 
-  const StationCard({Key? key, required this.station}) : super(key: key);
+  const StationCard({
+    Key? key,
+    required this.station,
+    required this.stationService,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +45,7 @@ class StationCard extends StatelessWidget {
             content: Text("Station ${station.name} deleted"),
           ),
         );
-        StationService().deleteStation(station.id , context);
+        stationService.deleteStation(station.id,);
       },
       background: Container(
         color: AppColors.secondaryLightOrange,

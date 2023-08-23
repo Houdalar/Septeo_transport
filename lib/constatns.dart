@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
-import 'package:provider/provider.dart';
-import 'package:septeo_transport/viewmodel/user_services.dart';
 import '../view/components/app_colors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -56,6 +53,24 @@ class ApiService {
     } else {
       throw ApiException(response.statusCode, response.body);
     }
+  }
+
+  void showdialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 

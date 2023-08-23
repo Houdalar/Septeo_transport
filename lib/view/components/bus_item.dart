@@ -5,23 +5,43 @@ import 'package:septeo_transport/view/components/app_colors.dart';
 import '../../model/bus.dart';
 import '../../session_manager.dart';
 import '../../viewmodel/bus_services.dart';
+import '../../viewmodel/station_services.dart';
 import '../../viewmodel/user_services.dart';
 import '../screens/admin/buses/bus_details.dart';
 
 class BusCard extends StatelessWidget {
   final Bus bus;
-  String role = SessionManager.Role;
+  final BusService busService;
+  final UserViewModel userService;
+  final SessionManager sessionManager;
+  final StationService stationService ;
 
-  BusCard({super.key, required this.bus});
+  BusCard({
+    super.key,
+    required this.bus,
+    required this.busService,
+    required this.sessionManager,
+    required this.userService,
+    required this.stationService,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return role == "Driver"
-        ? buildCard(context)
-        : buildDismissibleCard(context);
+    return FutureBuilder<String?>(
+      future: sessionManager.getRole(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          final role = snapshot.data ?? '';
+          return role == "Driver"
+              ? buildCard(context ,role)
+              : buildDismissibleCard(context, role);
+        }
+        return CircularProgressIndicator(); // or a placeholder widget
+      },
+    );
   }
 
-  Widget buildDismissibleCard(BuildContext context) {
+  Widget buildDismissibleCard(BuildContext context, String role) {
     return Dismissible(
       key: Key(bus.id),
       confirmDismiss: (direction) async {
@@ -50,8 +70,7 @@ class BusCard extends StatelessWidget {
             content: Text("Bus ${bus.busNumber} deleted"),
           ),
         );
-
-        BusService().deleteBus(bus.id, context);
+        busService.deleteBus(bus.id, context);
       },
       background: Container(
         color: AppColors.secondaryLightOrange,
@@ -67,11 +86,11 @@ class BusCard extends StatelessWidget {
           ),
         ),
       ),
-      child: buildCard(context),
+      child: buildCard(context, role),
     );
   }
 
-  Widget buildCard(BuildContext context) {
+  Widget buildCard(BuildContext context, String role) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -89,7 +108,7 @@ class BusCard extends StatelessWidget {
                 fontSize: 18.0,
               ),
             ),
-           const Spacer(),
+            const Spacer(),
             if (role == "Driver")
               IconButton(
                 icon: const Icon(Icons.message),
@@ -114,7 +133,8 @@ class BusCard extends StatelessWidget {
                                   context,
                                   listen: false);
                               userViewModel.sendMessage(
-                                  bus.id, controller.text);
+                                  busId: bus.id,
+                                  message: controller.text);
                               Navigator.of(context).pop();
                             },
                           ),
@@ -125,13 +145,14 @@ class BusCard extends StatelessWidget {
                 },
               ),
             IconButton(
-              icon: const Icon(Icons.arrow_forward_ios , color: AppColors.primaryOrange,),
+              icon: const Icon(Icons.arrow_forward_ios, color: AppColors.primaryOrange,),
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => BusDetailsScreen(
                       bus: bus,
-                      isdriver: role == "Driver",
+                      isDriver: role == "Driver", stationService:  stationService,
+                      busService: busService ,
                     ),
                   ),
                 );

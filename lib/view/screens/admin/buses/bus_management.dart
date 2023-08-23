@@ -5,39 +5,55 @@ import 'package:septeo_transport/view/screens/admin/buses/add_bus_sheet.dart';
 
 import '../../../../model/bus.dart';
 import '../../../../viewmodel/bus_services.dart';
+import '../../../../viewmodel/station_services.dart';
+import '../../../../viewmodel/user_services.dart';
 import '../../../components/bus_item.dart';
 import '../../../components/search_bar.dart';
 
 class BusManagement extends StatefulWidget {
-  const BusManagement({super.key,});
+  final BusService busService;
+  final UserViewModel userService;
+  final SessionManager sessionManager;
+  final StationService stationService;
+
+  const BusManagement({
+    Key? key,
+    required this.busService,
+    required this.userService,
+    required this.sessionManager,
+    required this.stationService,
+  }) : super(key: key);
 
   @override
   _BusManagementState createState() => _BusManagementState();
 }
 
-class _BusManagementState extends State<BusManagement>  {
- bool? isdriver;
-@override
+class _BusManagementState extends State<BusManagement> {
+  bool? isDriver;
+
+  @override
   void initState() {
     super.initState();
     _initializeRole();
   }
+
   Future<void> _initializeRole() async {
-    String role = await SessionManager.getRole();
+    String? role = await widget.sessionManager.getRole();
     setState(() {
-        isdriver = role == "Driver";
+      isDriver = role == "Driver";
     });
-    print("isdriver $isdriver");
-}
+    print("isDriver $isDriver");
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (isdriver == null) {
-    return const CircularProgressIndicator(); 
-  }
+    if (isDriver == null) {
+      return const CircularProgressIndicator();
+    }
     return SafeArea(
       child: Scaffold(
         body: FutureBuilder<List<Bus>>(
-          future: BusService().getBus(),
+          future: widget.busService.getBus(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -45,43 +61,20 @@ class _BusManagementState extends State<BusManagement>  {
               print(snapshot.error);
               return const Center(child: Text('Error loading data'));
             } else {
-              return Padding(
-                padding: EdgeInsets.only(
-                    top: isdriver! ? 30 : 120, left: 10.0, right: 10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (isdriver!)
-                      const Text(" buses list",
-                          style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    Search_bar(
-                      onChanged: (value) {},
-                    ),
-                    const SizedBox(height: 20),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          var bus = snapshot.data![index];
-                          return BusCard(bus: bus );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              );
+              return _buildBusList(snapshot.data!);
             }
           },
         ),
-        floatingActionButton: !isdriver!
+        floatingActionButton: !isDriver!
             ? FloatingActionButton(
                 onPressed: () {
                   showModalBottomSheet(
                     context: context,
                     builder: (context) {
-                      return const AddBusSheet(); // This will need to be defined too
+                      return AddBusSheet(
+                        busService: widget.busService,
+                        userViewModel: widget.userService,
+                      );
                     },
                   );
                 },
@@ -89,6 +82,40 @@ class _BusManagementState extends State<BusManagement>  {
                 child: const Icon(Icons.add),
               )
             : null,
+      ),
+    );
+  }
+
+  Widget _buildBusList(List<Bus> buses) {
+    return Padding(
+      padding: EdgeInsets.only(
+          top: isDriver! ? 30 : 120, left: 10.0, right: 10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (isDriver!)
+            const Text(" buses list",
+                style: TextStyle(
+                    fontSize: 25, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          Search_bar(onChanged: (value) {}),
+          const SizedBox(height: 20),
+          Expanded(
+            child: ListView.builder(
+              itemCount: buses.length,
+              itemBuilder: (context, index) {
+                var bus = buses[index];
+                return BusCard(
+                  bus: bus,
+                  busService: widget.busService,
+                  userService: widget.userService,
+                  sessionManager: widget.sessionManager,
+                  stationService: widget.stationService,
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../constatns.dart';
 import '../../../../model/user.dart';
 import '../../../../viewmodel/user_services.dart';
 import '../../../components/app_colors.dart';
 
 class AddOrUpdateUserSheet extends StatefulWidget {
   final User? user;
+  final UserViewModel userViewModel;
 
-  AddOrUpdateUserSheet({this.user});
+  AddOrUpdateUserSheet({
+    Key? key,
+    this.user,
+    required this.userViewModel,
+  }) : super(key: key);
 
   @override
   _AddOrUpdateUserSheetState createState() => _AddOrUpdateUserSheetState();
@@ -29,7 +32,7 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
     if (widget.user != null) {
       emailController.text = widget.user!.email;
       usernameController.text = widget.user!.username;
-     _selectedRole = widget.user!.role.toString().split('.').last;
+      _selectedRole = widget.user!.role.toString().split('.').last;
     }
   }
 
@@ -60,9 +63,30 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
     );
   }
 
+  Future<void> _handleUserAction() async {
+    if (_formKey.currentState!.validate()) {
+      if (widget.user != null) {
+        await widget.userViewModel.updateUser(
+          id : widget.user!.id,
+          email:emailController.text,
+         username: usernameController.text,
+          password :passwordController.text,
+          role:_selectedRole!,
+        );
+      } else {
+        await widget.userViewModel.createUser(
+          email :emailController.text,
+          password :usernameController.text,
+          username : passwordController.text,
+          role :_selectedRole!,
+        );
+      }
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -109,26 +133,7 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
                 ),
                 const SizedBox(height: 16.0),
                 ElevatedButton(
-                  onPressed: () async{
-                    if (_formKey.currentState!.validate()) {
-                      if (widget.user != null) {
-                        await userViewModel.updateUser(
-                          widget.user!.id,
-                          emailController.text,
-                          usernameController.text,
-                          passwordController.text,
-                          _selectedRole!,
-                        );
-                      } else {
-                        await userViewModel.createUser(
-                          emailController.text,
-                          usernameController.text,
-                          passwordController.text,
-                          _selectedRole!,
-                        );}
-                      Navigator.pop(context);
-                    }
-                  },
+                  onPressed: _handleUserAction,
                   child: Text(widget.user != null ? 'Update' : 'Add'),
                 ),
               ],
