@@ -57,9 +57,7 @@ class ApiService {
       throw ApiException(response.statusCode, response.body);
     }
   }
-}
-
-void showdialog(BuildContext context, String title, String message) {
+  void showdialog(BuildContext context, String title, String message) {
   showDialog(
     context: context,
     builder: (context) {
@@ -76,6 +74,9 @@ void showdialog(BuildContext context, String title, String message) {
     },
   );
 }
+}
+
+
 
 class ApiException implements Exception {
   final int statusCode;

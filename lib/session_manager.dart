@@ -5,7 +5,7 @@ class SessionManager {
 
   SessionManager({required this.prefs});
 
-  Future<void> saveUserId(String id) async {
+  Future<void> saveUserId( String id) async {
     await prefs.setString("userId", id);
   }
 
