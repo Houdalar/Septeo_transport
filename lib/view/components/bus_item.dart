@@ -5,30 +5,21 @@ import 'package:septeo_transport/view/components/app_colors.dart';
 import '../../model/bus.dart';
 import '../../session_manager.dart';
 import '../../viewmodel/bus_services.dart';
-import '../../viewmodel/station_services.dart';
 import '../../viewmodel/user_services.dart';
 import '../screens/admin/buses/bus_details.dart';
 
 class BusCard extends StatelessWidget {
   final Bus bus;
-  final BusService busService;
-  final UserViewModel userService;
-  final SessionManager sessionManager;
-  final StationService stationService ;
 
   BusCard({
     super.key,
-    required this.bus,
-    required this.busService,
-    required this.sessionManager,
-    required this.userService,
-    required this.stationService,
+    required this.bus
   });
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
-      future: sessionManager.getRole(),
+      future: context.read<SessionManager>().getRole(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           final role = snapshot.data ?? '';
@@ -70,7 +61,7 @@ class BusCard extends StatelessWidget {
             content: Text("Bus ${bus.busNumber} deleted"),
           ),
         );
-        busService.deleteBus(bus.id, context);
+        context.read<BusService>().deleteBus(bus.id, context);
       },
       background: Container(
         color: AppColors.secondaryLightOrange,
@@ -129,10 +120,7 @@ class BusCard extends StatelessWidget {
                           TextButton(
                             child: const Text('SEND'),
                             onPressed: () {
-                              final userViewModel = Provider.of<UserViewModel>(
-                                  context,
-                                  listen: false);
-                              userViewModel.sendMessage(
+                              context.read<UserViewModel>().sendMessage(
                                   busId: bus.id,
                                   message: controller.text);
                               Navigator.of(context).pop();
@@ -151,8 +139,7 @@ class BusCard extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => BusDetailsScreen(
                       bus: bus,
-                      isDriver: role == "Driver", stationService:  stationService,
-                      busService: busService ,
+                      isDriver: role == "Driver",
                     ),
                   ),
                 );

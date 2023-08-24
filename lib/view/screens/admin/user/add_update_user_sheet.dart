@@ -6,12 +6,10 @@ import '../../../components/app_colors.dart';
 
 class AddOrUpdateUserSheet extends StatefulWidget {
   final User? user;
-  final UserViewModel userViewModel;
 
   AddOrUpdateUserSheet({
     Key? key,
     this.user,
-    required this.userViewModel,
   }) : super(key: key);
 
   @override
@@ -66,7 +64,7 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
   Future<void> _handleUserAction() async {
     if (_formKey.currentState!.validate()) {
       if (widget.user != null) {
-        await widget.userViewModel.updateUser(
+        await context.read<UserViewModel>().updateUser(
           id : widget.user!.id,
           email:emailController.text,
          username: usernameController.text,
@@ -74,7 +72,7 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
           role:_selectedRole!,
         );
       } else {
-        await widget.userViewModel.createUser(
+        await context.read<UserViewModel>().createUser(
           email :emailController.text,
           password :usernameController.text,
           username : passwordController.text,

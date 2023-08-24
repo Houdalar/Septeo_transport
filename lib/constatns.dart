@@ -9,9 +9,7 @@ class ApiService {
 
   ApiService({
     this.baseUrl = "10.0.2.2:8080",
-    this.headers = const {
-      "Content-Type": "application/json; charset=UTF-8"
-    },
+    this.headers = const {"Content-Type": "application/json; charset=UTF-8"},
   });
 
   Future<dynamic> post(String url, Map<String, dynamic> body) async {
@@ -20,7 +18,12 @@ class ApiService {
       headers: headers,
       body: json.encode(body),
     );
-    return _handleResponse(response);
+    final result = _handleResponse(response);
+    if (result != null) {
+      return result;
+    } else {
+      throw ApiException(response.statusCode, "Null response received");
+    }
   }
 
   Future<dynamic> get(String url) async {
@@ -54,24 +57,24 @@ class ApiService {
       throw ApiException(response.statusCode, response.body);
     }
   }
+}
 
-  void showdialog(BuildContext context, String title, String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+void showdialog(BuildContext context, String title, String message) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class ApiException implements Exception {

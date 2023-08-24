@@ -7,7 +7,9 @@ import 'package:place_picker/place_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class AddStationSheet extends StatefulWidget {
-  const AddStationSheet({super.key});
+ final StationService stationService;
+
+  AddStationSheet({required this.stationService});
 
   @override
   _AddStationSheetState createState() => _AddStationSheetState();
@@ -20,7 +22,6 @@ class _AddStationSheetState extends State<AddStationSheet> {
   final _stationLocationController = TextEditingController();
   final _latController = TextEditingController();
   final _lngController = TextEditingController();
-  final StationService stationService = StationService();
   double? pickedLatitude;
   double? pickedLongitude;
 
@@ -82,144 +83,42 @@ class _AddStationSheetState extends State<AddStationSheet> {
       ),
       arrivalTimes: [],
     );
-    await stationService.createStation(station, context);
+    await widget.stationService.createStation(station);
   }
 
-  @override
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    required String validationText,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hintText,
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: AppColors.primaryOrange),
+          borderRadius: BorderRadius.circular(32.0),
+        ),
+        border: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(32.0),
+        ),
+        filled: true,
+        fillColor: AppColors.auxiliaryOffWhite,
+        prefixIcon: Icon(icon, color: AppColors.auxiliaryGrey),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return validationText;
+        }
+        return null;
+      },
+    );
+  }
+
+   @override
   Widget build(BuildContext context) {
-    final stationNameField = TextFormField(
-      controller: _stationNameController,
-      decoration: InputDecoration(
-        hintText: 'Station Name',
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: AppColors.primaryOrange),
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        filled: true,
-        fillColor: AppColors.auxiliaryOffWhite,
-        prefixIcon: const Icon(
-          Icons.train,
-          color: AppColors.auxiliaryGrey,
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter station name';
-        }
-        return null;
-      },
-    );
-
-    final stationAddressField = TextFormField(
-      controller: _stationAddressController,
-      decoration: InputDecoration(
-        hintText: 'Station Address',
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: AppColors.primaryOrange),
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        filled: true,
-        fillColor: AppColors.auxiliaryOffWhite,
-        prefixIcon: const Icon(
-          Icons.location_on,
-          color: AppColors.auxiliaryGrey,
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter station address';
-        }
-        return null;
-      },
-    );
-
-    final locationField = TextFormField(
-      controller: _stationLocationController,
-      decoration: InputDecoration(
-        hintText: ' location : lat, lng',
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: AppColors.primaryOrange),
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        filled: true,
-        fillColor: AppColors.auxiliaryOffWhite,
-        prefixIcon: const Icon(
-          Icons.location_on,
-          color: AppColors.auxiliaryGrey,
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please pick a location from the map';
-        }
-        return null;
-      },
-    );
-    final latField = TextFormField(
-      controller: _latController,
-      decoration: InputDecoration(
-        hintText: 'lat',
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: AppColors.primaryOrange),
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        filled: true,
-        fillColor: AppColors.auxiliaryOffWhite,
-        prefixIcon: const Icon(
-          Icons.location_on,
-          color: AppColors.auxiliaryGrey,
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please pick enter lat';
-        }
-        return null;
-      },
-    );
-    final lngField = TextFormField(
-      controller: _lngController,
-      decoration: InputDecoration(
-        hintText: 'lng',
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: AppColors.primaryOrange),
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-        filled: true,
-        fillColor: AppColors.auxiliaryOffWhite,
-        prefixIcon: const Icon(
-          Icons.location_on,
-          color: AppColors.auxiliaryGrey,
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please pick enter lng';
-        }
-        return null;
-      },
-    );
-
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Form(
@@ -227,18 +126,47 @@ class _AddStationSheetState extends State<AddStationSheet> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            stationNameField,
+            _buildTextField(
+              controller: _stationNameController,
+              hintText: 'Station Name',
+              icon: Icons.train,
+              validationText: 'Please enter station name',
+            ),
             const SizedBox(height: 30),
-            stationAddressField,
+            _buildTextField(
+              controller: _stationAddressController,
+              hintText: 'Station Address',
+              icon: Icons.location_on,
+              validationText: 'Please enter station address',
+            ),
             const SizedBox(height: 20),
-            locationField,
+            _buildTextField(
+              controller: _stationLocationController,
+              hintText: 'Location: lat, lng',
+              icon: Icons.location_on,
+              validationText: 'Please pick a location from the map',
+            ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(child: latField),
+                Expanded(
+                  child: _buildTextField(
+                    controller: _latController,
+                    hintText: 'lat',
+                    icon: Icons.location_on,
+                    validationText: 'Please enter lat',
+                  ),
+                ),
                 const SizedBox(width: 10),
-                Expanded(child: lngField),
+                Expanded(
+                  child: _buildTextField(
+                    controller: _lngController,
+                    hintText: 'lng',
+                    icon: Icons.location_on,
+                    validationText: 'Please enter lng',
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 20),

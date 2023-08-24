@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-
+import 'package:provider/provider.dart';
 import '../../../../model/bus.dart';
 import '../../../../model/station.dart';
 import '../../../../viewmodel/station_services.dart';
@@ -11,7 +10,10 @@ import '../../../components/stations_bus.dart';
 class StationDetailsScreen extends StatefulWidget {
   final Station station;
 
-  const StationDetailsScreen({super.key, required this.station});
+  const StationDetailsScreen({
+    Key? key,
+    required this.station,
+  }) : super(key: key);
 
   @override
   State<StationDetailsScreen> createState() => _StationDetailsScreenState();
@@ -25,8 +27,6 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
 
   int _polygonIdCounter = 1;
   int _polylineIdCounter = 1;
-
-  final StationService stationService = StationService();
 
   String calculateTimeRemaining(String arrivalTime) {
     final DateTime now = DateTime.now();
@@ -56,19 +56,18 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
     super.initState();
     _getAndSetDirections();
   }
-void _getAndSetDirections() async {
-  List<LatLng> directions = await stationService.getOpenRouteCoordinates(
-    LatLng(widget.station.location.lat, widget.station.location.lng),
-    LatLng(36.84790,10.26857),
-    
-  );
 
- 
+  void _getAndSetDirections() async {
+    List<LatLng> directions =
+        await context.read<StationService>().getOpenRouteCoordinates(
+      LatLng(widget.station.location.lat, widget.station.location.lng),
+      const LatLng(36.84790, 10.26857),
+    );
 
-  setState(() {
-    _setPolyline(directions);
-  });
-}
+    setState(() {
+      _setPolyline(directions);
+    });
+  }
 
   void _setPolygon() {
     final String polygonIdVal = 'polygon_$_polygonIdCounter';
@@ -85,18 +84,18 @@ void _getAndSetDirections() async {
   }
 
   void _setPolyline(List<LatLng> points) {
-  final String polylineIdVal = 'polyline_$_polylineIdCounter';
-  _polylineIdCounter++;
+    final String polylineIdVal = 'polyline_$_polylineIdCounter';
+    _polylineIdCounter++;
 
-  _polylines.add(
-    Polyline(
-      polylineId: PolylineId(polylineIdVal),
-      width: 2,
-      color: Colors.blue,
-      points: points,
-    ),
-  );
-}
+    _polylines.add(
+      Polyline(
+        polylineId: PolylineId(polylineIdVal),
+        width: 2,
+        color: Colors.blue,
+        points: points,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +115,8 @@ void _getAndSetDirections() async {
                   markerId: MarkerId(widget.station.id),
                   position: LatLng(
                       widget.station.location.lat, widget.station.location.lng),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueOrange),
                 ),
                 Marker(
                   markerId: const MarkerId("septeo"),
@@ -161,7 +161,7 @@ void _getAndSetDirections() async {
                   height: MediaQuery.of(context).size.height * 0.25,
                   width: MediaQuery.of(context).size.width,
                   decoration: const BoxDecoration(
-                    color: Color.fromARGB(0, 255, 255, 255) ,
+                    color: Color.fromARGB(0, 255, 255, 255),
                     borderRadius: BorderRadius.all(Radius.circular(30)),
                     boxShadow: [
                       BoxShadow(
@@ -178,9 +178,9 @@ void _getAndSetDirections() async {
                   child: ListView.separated(
                     itemCount: widget.station.arrivalTimes.length,
                     itemBuilder: (context, index) {
-                      ArrivalTime arrivalTime = widget.station.arrivalTimes[index];
-                      Bus bus = arrivalTime
-                          .bus!; 
+                      ArrivalTime arrivalTime =
+                          widget.station.arrivalTimes[index];
+                      Bus bus = arrivalTime.bus!;
                       return BusItemCard(
                         arrivalTime: arrivalTime,
                         bus: bus,
@@ -188,8 +188,7 @@ void _getAndSetDirections() async {
                       );
                     },
                     separatorBuilder: (context, index) => const Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 30.0), 
+                      padding: EdgeInsets.symmetric(horizontal: 30.0),
                       child: Divider(
                         color: Colors.grey,
                         height: 1,

@@ -14,11 +14,8 @@ import '../admin/user/user_managment_screen.dart';
 import '../employee/employee_space.dart';
 
 class QuickAccess extends StatefulWidget {
-   
-
   const QuickAccess({
     super.key,
-    
   });
   @override
   State<QuickAccess> createState() => _QuickAccessState();
@@ -26,10 +23,10 @@ class QuickAccess extends StatefulWidget {
 
 class _QuickAccessState extends State<QuickAccess> {
   String? Role;
-  bool hasUnreadNotification =false;
+  bool hasUnreadNotification = false;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-    Future<void> _showNotification(String title, String body) async {
+  Future<void> _showNotification(String title, String body) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails('your channel id', 'your channel name',
             importance: Importance.max,
@@ -41,10 +38,10 @@ class _QuickAccessState extends State<QuickAccess> {
         .show(0, title, body, platformChannelSpecifics, payload: '/AppHome');
   }
 
-   Future<String> _initializeRole() async {
-    return await SessionManager.getRole();
-    
-}
+  Future<String?> _initializeRole() async {
+    return await context.read<SessionManager>().getRole();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -52,9 +49,8 @@ class _QuickAccessState extends State<QuickAccess> {
       setState(() {
         Role = fetchedRole;
       });
-    
     });
-     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
@@ -70,42 +66,41 @@ class _QuickAccessState extends State<QuickAccess> {
 
   void onNotificationIconClicked() {
     setState(() {
-      hasUnreadNotification = false; 
+      hasUnreadNotification = false;
     });
     showNotificationsDialog(context);
-
   }
 
   Future<void> showNotificationsDialog(BuildContext context) async {
-     final userViewModel = Provider.of<UserViewModel>(context, listen: false);
-  List<notification> notifications = await userViewModel.fetchNotifications();
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    List<notification> notifications = await userViewModel.fetchNotifications();
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Notifications'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            itemCount: notifications.length,
-            itemBuilder: (context, index) {
-              return NotificationItem( notif: notifications[index]);
-            },
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Notifications'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              itemCount: notifications.length,
+              itemBuilder: (context, index) {
+                return NotificationItem(notif: notifications[index]);
+              },
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Close'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+          actions: [
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +211,7 @@ class _QuickAccessState extends State<QuickAccess> {
                       'Bus driver-pana.png', const AdminSpace()),
                 if (Role == "Admin")
                   createQuickAccessCard(context, 'user Management',
-                      'Office management-cuate.png', UserManagement()),
+                      'Office management-cuate.png', const UserManagement()),
                 createQuickAccessCard(context, 'payment Management',
                     'Investment data-cuate.png', const BusManagement()),
                 createQuickAccessCard(context, 'bus Schedule',

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:septeo_transport/constatns.dart';
-
-import '../../../model/bus.dart';
 import '../../../model/planning.dart';
-import '../../../model/station.dart';
 import '../../../session_manager.dart';
 import '../../../viewmodel/user_services.dart';
 import '../../components/app_colors.dart';
@@ -32,14 +28,13 @@ class _EmployeeSpaceState extends State<EmployeeSpace> {
   void initState() {
     super.initState();
     fetchWeekPlanning();
-    print(SessionManager.userId);
   }
 
   Future<void> fetchWeekPlanning() async {
     try {
-      String userId = await SessionManager.getUserId();
+      final userId = await  Provider.of<SessionManager>(context).getUserId();
       final userViewModel = Provider.of<UserViewModel>(context, listen: false);
-      var planning = await userViewModel.fetchPlannings(userId, _selectedWeek);
+      var planning = await userViewModel.fetchPlannings(userId!, _selectedWeek);
       setState(() {
         weekPlannings = planning;
         filterPlannings(_selectedDate);

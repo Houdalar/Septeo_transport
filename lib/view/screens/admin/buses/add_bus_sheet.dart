@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:septeo_transport/viewmodel/station_services.dart';
-
+import 'package:provider/provider.dart';
 import '../../../../model/user.dart';
 import '../../../../viewmodel/bus_services.dart';
 import '../../../../viewmodel/user_services.dart';
 import '../../../components/app_colors.dart';
 
 class AddBusSheet extends StatefulWidget {
-  final BusService busService;
-  final UserViewModel userViewModel;
-
   const AddBusSheet({
     Key? key,
-    required this.busService,
-    required this.userViewModel,
   }) : super(key: key);
 
   @override
@@ -42,14 +36,14 @@ class _AddBusSheetState extends State<AddBusSheet> {
   }
 
   Future<void> fetchDrivers() async {
-    _drivers = await widget.userViewModel.getDrivers();
+    _drivers = await context.read<UserViewModel>().getDrivers();
     if (_drivers.isNotEmpty) {
       _selectedDriver = _drivers[0].id;
     }
   }
 
   Future<void> createNewBus() async {
-    widget.busService.createNewBus(
+    context.read<BusService>().createNewBus(
       int.tryParse(_CapacityController.text) ?? 0,
       _busNumberController.text,
       context,

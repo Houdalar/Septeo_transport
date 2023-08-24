@@ -1,12 +1,12 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:provider/provider.dart';
 import 'package:septeo_transport/viewmodel/user_services.dart';
 import '../../../components/app_colors.dart';
 
 class LoginPage extends StatefulWidget {
-  final UserViewModel userViewModel;
-  const LoginPage({Key? key, required this.userViewModel}) : super(key: key);
+  const LoginPage({Key? key,}) : super(key: key);
 
   @override
   LoginPageState createState() => LoginPageState();
@@ -149,7 +149,7 @@ class LoginPageState extends State<LoginPage> {
 
           // Get the registration token
           String? token = await FirebaseMessaging.instance.getToken();
-          await widget.userViewModel.login(email, password, token!, context);
+          await context.read<UserViewModel>().login(email, password, token!, context);
         }
       },
       style: ElevatedButton.styleFrom(

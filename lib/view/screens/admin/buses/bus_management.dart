@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:septeo_transport/session_manager.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 import 'package:septeo_transport/view/screens/admin/buses/add_bus_sheet.dart';
@@ -11,17 +12,8 @@ import '../../../components/bus_item.dart';
 import '../../../components/search_bar.dart';
 
 class BusManagement extends StatefulWidget {
-  final BusService busService;
-  final UserViewModel userService;
-  final SessionManager sessionManager;
-  final StationService stationService;
-
   const BusManagement({
     Key? key,
-    required this.busService,
-    required this.userService,
-    required this.sessionManager,
-    required this.stationService,
   }) : super(key: key);
 
   @override
@@ -38,7 +30,7 @@ class _BusManagementState extends State<BusManagement> {
   }
 
   Future<void> _initializeRole() async {
-    String? role = await widget.sessionManager.getRole();
+    String? role = await context.read<SessionManager>().getRole();
     setState(() {
       isDriver = role == "Driver";
     });
@@ -53,7 +45,7 @@ class _BusManagementState extends State<BusManagement> {
     return SafeArea(
       child: Scaffold(
         body: FutureBuilder<List<Bus>>(
-          future: widget.busService.getBus(),
+          future: context.read<BusService>().getBus(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -71,10 +63,7 @@ class _BusManagementState extends State<BusManagement> {
                   showModalBottomSheet(
                     context: context,
                     builder: (context) {
-                      return AddBusSheet(
-                        busService: widget.busService,
-                        userViewModel: widget.userService,
-                      );
+                      return const AddBusSheet();
                     },
                   );
                 },
@@ -88,15 +77,14 @@ class _BusManagementState extends State<BusManagement> {
 
   Widget _buildBusList(List<Bus> buses) {
     return Padding(
-      padding: EdgeInsets.only(
-          top: isDriver! ? 30 : 120, left: 10.0, right: 10.0),
+      padding:
+          EdgeInsets.only(top: isDriver! ? 30 : 120, left: 10.0, right: 10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (isDriver!)
             const Text(" buses list",
-                style: TextStyle(
-                    fontSize: 25, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
           Search_bar(onChanged: (value) {}),
           const SizedBox(height: 20),
@@ -107,10 +95,6 @@ class _BusManagementState extends State<BusManagement> {
                 var bus = buses[index];
                 return BusCard(
                   bus: bus,
-                  busService: widget.busService,
-                  userService: widget.userService,
-                  sessionManager: widget.sessionManager,
-                  stationService: widget.stationService,
                 );
               },
             ),

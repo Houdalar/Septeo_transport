@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../model/station.dart';
 import '../screens/admin/stations/station_detail_screen.dart';
@@ -7,12 +8,10 @@ import 'app_colors.dart';
 
 class StationCard extends StatelessWidget {
   final Station station;
-  final StationService stationService;
 
   const StationCard({
     Key? key,
     required this.station,
-    required this.stationService,
   }) : super(key: key);
 
   @override
@@ -45,7 +44,7 @@ class StationCard extends StatelessWidget {
             content: Text("Station ${station.name} deleted"),
           ),
         );
-        stationService.deleteStation(station.id,);
+        context.read<StationService>().deleteStation(station.id,);
       },
       background: Container(
         color: AppColors.secondaryLightOrange,
@@ -85,7 +84,7 @@ class StationCard extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => StationDetailsScreen(station: station),
+                  builder: (context) => StationDetailsScreen(station: station ,),
                 ),
               );
             },

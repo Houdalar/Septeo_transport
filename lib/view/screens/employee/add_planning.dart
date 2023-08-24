@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:septeo_transport/model/planning.dart';
-
-import '../../../constatns.dart';
-import '../../../model/bus.dart';
 import '../../../model/station.dart';
 import '../../../viewmodel/station_services.dart';
 import '../../../viewmodel/user_services.dart';
@@ -24,7 +21,6 @@ class _AddPlanningFormState extends State<AddPlanningForm> {
   ArrivalTime? _selectedToBus;
   List<Station> _stations = [];
   bool _isUpdateMode = false;
-  
 
   @override
   void initState() {
@@ -33,18 +29,24 @@ class _AddPlanningFormState extends State<AddPlanningForm> {
   }
 
   Future<void> _fetchStations() async {
-    List<Station> stations = await StationService.getStations();
+    List<Station> stations = await context.read<StationService>().getStations();
 
-   if (widget.planning != null) {
-  _selectedFromStation = stations.firstWhere((s) => s.id == widget.planning!.fromStation.id);
-  _selectedToStation = stations.firstWhere((s) => s.id == widget.planning!.toStation.id);
+    if (widget.planning != null) {
+      _selectedFromStation =
+          stations.firstWhere((s) => s.id == widget.planning!.fromStation.id);
+      _selectedToStation =
+          stations.firstWhere((s) => s.id == widget.planning!.toStation.id);
 
-  var afterFifteen = (ArrivalTime b) => DateTime.parse("1970-01-01 ${b.time}:00Z").hour > 15;
-  var beforeFifteen = (ArrivalTime b) => DateTime.parse("1970-01-01 ${b.time}:00Z").hour < 15;
+      afterFifteen(ArrivalTime b) =>
+          DateTime.parse("1970-01-01 ${b.time}:00Z").hour > 15;
+      beforeFifteen(ArrivalTime b) =>
+          DateTime.parse("1970-01-01 ${b.time}:00Z").hour < 15;
 
-  _selectedFromBus = _selectedFromStation?.arrivalTimes.firstWhere((b) => b.bus?.id == widget.planning!.startbus?.id && beforeFifteen(b));
-  _selectedToBus = _selectedToStation?.arrivalTimes.firstWhere((b) => b.bus?.id == widget.planning!.finishbus?.id && afterFifteen(b));
-}
+      _selectedFromBus = _selectedFromStation?.arrivalTimes.firstWhere(
+          (b) => b.bus?.id == widget.planning!.startbus.id && beforeFifteen(b));
+      _selectedToBus = _selectedToStation?.arrivalTimes.firstWhere(
+          (b) => b.bus?.id == widget.planning!.finishbus.id && afterFifteen(b));
+    }
 
     setState(() {
       _stations = stations;
@@ -89,8 +91,8 @@ class _AddPlanningFormState extends State<AddPlanningForm> {
     });
   }
 
- void _submit() async {
-  final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+  void _submit() async {
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     if (_selectedFromStation == null ||
         _selectedToStation == null ||
         _selectedFromBus == null ||
@@ -103,38 +105,38 @@ class _AddPlanningFormState extends State<AddPlanningForm> {
       return;
     }
 
-
     if (widget.planning == null) {
       // In add mode, add the planning
-      
-      await userViewModel.addPlanning(
-          widget.selectedDate!.toIso8601String(),
-          _selectedFromStation!.id,
-          _selectedToStation!.id,
-          _selectedFromBus!.bus!.id,
-          _selectedToBus!.bus!.id,
-          context);
+
+      await context.read<UserViewModel>().addPlanning(
+            date: widget.selectedDate!.toIso8601String(),
+            fromStation: _selectedFromStation!.id,
+            toStation: _selectedToStation!.id,
+            startBus: _selectedFromBus!.bus!.id,
+            finishBus: _selectedToBus!.bus!.id,
+          );
     } else {
       // In update mode, update the planning
-     _isUpdateMode = await userViewModel.updatePlanning(
-          widget.planning!.id,
-          DateTime.now().toIso8601String(),
-          _selectedFromStation!.id,
-          _selectedToStation!.id,
-          _selectedFromBus!.bus!.id,
-          _selectedToBus!.bus!.id,
+      _isUpdateMode = await context.read<UserViewModel>().updatePlanning(
+            id: widget.planning!.id,
+            date: DateTime.now().toIso8601String(),
+            fromStationId: _selectedFromStation!.id,
+            toStationId: _selectedToStation!.id,
+            startBusId: _selectedFromBus!.bus!.id,
+            finishBusId: _selectedToBus!.bus!.id,
           );
-          Navigator.of(context).pop();
-     if (_isUpdateMode) {
-       
-       SnackBar snackBar = const SnackBar(content: Text("Planning updated successfully"));
-       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-     } else {
-       SnackBar snackBar = const SnackBar(content: Text("Error updating planning"));
-       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-     }    
+      Navigator.of(context).pop();
+      if (_isUpdateMode) {
+        SnackBar snackBar =
+            const SnackBar(content: Text("Planning updated successfully"));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      } else {
+        SnackBar snackBar =
+            const SnackBar(content: Text("Error updating planning"));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    }
   }
-}
 
   DropdownButtonFormField<Station> _buildDropdown(List<Station> items,
       Station? selectedValue, Function onChanged, String hint) {
@@ -257,44 +259,49 @@ class _AddPlanningFormState extends State<AddPlanningForm> {
     );
   }
 
- @override
-Widget build(BuildContext context) {
-  return SingleChildScrollView(
-    padding: const EdgeInsets.all(16),
-    child: ConstrainedBox(
-      constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          const Text("Add Planning", style: TextStyle(fontSize: 25)),
-           const SizedBox(height: 50),
-          _buildDropdown(_stations, _selectedFromStation, _selectFromStation, 'First Station'),
-          const SizedBox(height: 16),
-          _buildBusDropdown(_selectedFromStation, _selectedFromBus, _selectFromBus, 'Bus', false),
-          const SizedBox(height: 40),
-          _buildDropdown(_stations, _selectedToStation, _selectToStation, 'Second Station'),
-          const SizedBox(height: 16),
-          _buildBusDropdown(_selectedToStation, _selectedToBus, _selectToBus, 'Bus', true),
-          const SizedBox(height: 40),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _submit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOrange,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32.0),
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: ConstrainedBox(
+        constraints:
+            BoxConstraints(minHeight: MediaQuery.of(context).size.height),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            const Text("Add Planning", style: TextStyle(fontSize: 25)),
+            const SizedBox(height: 50),
+            _buildDropdown(_stations, _selectedFromStation, _selectFromStation,
+                'First Station'),
+            const SizedBox(height: 16),
+            _buildBusDropdown(_selectedFromStation, _selectedFromBus,
+                _selectFromBus, 'Bus', false),
+            const SizedBox(height: 40),
+            _buildDropdown(_stations, _selectedToStation, _selectToStation,
+                'Second Station'),
+            const SizedBox(height: 16),
+            _buildBusDropdown(
+                _selectedToStation, _selectedToBus, _selectToBus, 'Bus', true),
+            const SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryOrange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32.0),
+                  ),
+                  padding: const EdgeInsets.all(16.0),
                 ),
-                padding: const EdgeInsets.all(16.0),
+                child: Text(widget.planning == null ? 'Add' : 'Update'),
               ),
-              child:Text(widget.planning == null ? 'Add' : 'Update'),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

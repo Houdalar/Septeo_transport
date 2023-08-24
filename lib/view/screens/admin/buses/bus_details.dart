@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:septeo_transport/model/bus.dart';
 import 'package:septeo_transport/model/station.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
-import '../../../../viewmodel/bus_services.dart';
 import '../../../../viewmodel/station_services.dart';
 import 'details_tab.dart';
 import 'stations_tab.dart';
@@ -11,15 +11,11 @@ import 'stations_tab.dart';
 class BusDetailsScreen extends StatefulWidget {
   final Bus bus;
   final bool isDriver;
-  final StationService stationService;
-  final BusService busService;
 
   const BusDetailsScreen({
     Key? key,
     required this.bus,
     required this.isDriver,
-    required this.stationService,
-    required this.busService,
   }) : super(key: key);
 
   @override
@@ -35,7 +31,7 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
   }
 
   Future<List<Station>> fetchStations() async {
-    return await widget.stationService.getPlanningStations(widget.bus.id);
+    return await context.read<StationService>().getPlanningStations(widget.bus.id);
   }
 
   Set<Marker> createMarkers(List<Station> stations) {
@@ -56,7 +52,7 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
     List<LatLng> polylineCoordinates = [];
 
     for (var i = 0; i < stations.length - 1; i++) {
-      List<LatLng> route = await widget.stationService.getOpenRouteCoordinates(
+      List<LatLng> route = await context.read<StationService>().getOpenRouteCoordinates(
           LatLng(stations[i].location.lat, stations[i].location.lng),
           LatLng(stations[i + 1].location.lat, stations[i + 1].location.lng));
       polylineCoordinates.addAll(route);
@@ -238,7 +234,6 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                     scrollController: scrollController,
                     bus: widget.bus,
                     isDriver: widget.isDriver,
-                    busService: widget.busService,
                   ),
                 ],
               ),

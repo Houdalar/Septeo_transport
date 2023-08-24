@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:septeo_transport/view/components/app_colors.dart';
 
+import '../../constatns.dart';
 import '../../model/planning.dart';
 import '../../viewmodel/user_services.dart';
 import '../screens/employee/add_planning.dart';
 
 class PlanningCard extends StatelessWidget {
   final Planning planning;
-  final UserViewModel userViewModel;
 
   const PlanningCard({
     Key? key,
     required this.planning,
-    required this.userViewModel,
   }) : super(key: key);
 
   String getFirstArrivalTime() {
@@ -61,7 +61,7 @@ class PlanningCard extends StatelessWidget {
                   TextButton(
                     child: const Text('Delete'),
                     onPressed: () async {
-                      await userViewModel.deletePlanning(planning.id);
+                      await context.read<UserViewModel>().deletePlanning(planning.id);
                       Navigator.of(context).pop();
                     },
                   ),

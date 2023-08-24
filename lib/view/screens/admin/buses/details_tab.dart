@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:septeo_transport/model/bus.dart';
 import '../../../../model/station.dart';
 import '../../../../viewmodel/bus_services.dart';
@@ -11,13 +12,11 @@ class BusDetailsTab extends StatefulWidget {
   final Bus bus;
   final ScrollController scrollController;
   final bool isDriver;
-  final BusService busService;
 
   BusDetailsTab({
     required this.bus,
     required this.scrollController,
     required this.isDriver,
-    required this.busService,
   });
 
   @override
@@ -148,7 +147,7 @@ class _BusDetailsTabState extends State<BusDetailsTab> {
     if (_editState == EditState.editing) {
       String updatedBusNumber = _busNumberController.text;
       int updatedCapacity = int.parse(_capacityController.text);
-      bool isSuccess = await widget.busService.updateBus(
+      bool isSuccess = await context.read<BusService>().updateBus(
           widget.bus.id, updatedCapacity, updatedBusNumber);
       if (isSuccess) {
         setState(() {

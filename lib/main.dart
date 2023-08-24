@@ -138,12 +138,10 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute: '/splash',
       onGenerateRoute: (settings) {
-        final userViewModel = context.read<UserViewModel>();
         switch (settings.name) {
           case '/':
             return MaterialPageRoute(
-                builder: (context) => LoginPage(
-                      userViewModel: userViewModel,
+                builder: (context) => const LoginPage(
                     ));
           case '/home':
             return MaterialPageRoute(builder: (context) => const Home());
