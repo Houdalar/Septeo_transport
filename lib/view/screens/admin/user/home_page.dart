@@ -8,7 +8,6 @@ import 'home_screen.dart';
 import 'settings_page.dart';
 
 class Home extends StatefulWidget {
-
   const Home({
     Key? key,
   }) : super(key: key);
@@ -20,8 +19,8 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> {
   int currentIndex = 0;
   String? role;
-  late List<IconData> listOfIcons;
-  late List<String> listOfStrings;
+  List<IconData> listOfIcons = [];
+  List<String> listOfStrings = [];
 
   @override
   void initState() {
@@ -33,11 +32,16 @@ class HomeState extends State<Home> {
     String? fetchedRole = await context.read<SessionManager>().getRole();
     setState(() {
       role = fetchedRole;
+      print(fetchedRole);
       if (role == "Driver") {
         listOfIcons = [Icons.directions_bus, Icons.settings_rounded];
         listOfStrings = ['driver', 'Settings'];
       } else {
-        listOfIcons = [Icons.home_rounded, Icons.directions_bus, Icons.settings_rounded];
+        listOfIcons = [
+          Icons.home_rounded,
+          Icons.directions_bus,
+          Icons.settings_rounded
+        ];
         listOfStrings = ['Home', 'transport', 'Settings'];
       }
     });
@@ -53,8 +57,12 @@ class HomeState extends State<Home> {
             IndexedStack(
               index: currentIndex,
               children: role == "Driver"
-                  ? [ const BusManagement(), const SettingsPage()]
-                  : [const QuickAccess(), const HomePage(), const SettingsPage()],
+                  ? [const BusManagement(), const SettingsPage()]
+                  : [
+                      const QuickAccess(),
+                      const HomePage(),
+                      const SettingsPage()
+                    ],
             ),
             Positioned(
               left: 0,
@@ -129,12 +137,8 @@ class BottomNavigation extends StatelessWidget {
                     child: AnimatedContainer(
                       duration: const Duration(seconds: 1),
                       curve: Curves.fastLinearToSlowEaseIn,
-                      height: index == currentIndex
-                          ? displayWidth * .12
-                          : 0,
-                      width: index == currentIndex
-                          ? displayWidth * .32
-                          : 0,
+                      height: index == currentIndex ? displayWidth * .12 : 0,
+                      width: index == currentIndex ? displayWidth * .32 : 0,
                       decoration: BoxDecoration(
                         color: index == currentIndex
                             ? AppColors.primaryOrange

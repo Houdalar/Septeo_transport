@@ -23,10 +23,24 @@ class StationService extends ChangeNotifier {
   StationService({required this.apiService});
 
   Future<List<Station>> fetchStations(String busId) async {
+    print('fetchStations called with busId: $busId'); // Add this
+
     try {
-      var stationList = await apiService.get('station/buses/$busId');
-      return stationList.map((i) => Station.fromJson(i)).toList();
+      final response = await apiService.get('station/buses/$busId');
+      print(
+          'API Response: $response'); // This should print the raw API response
+
+      if (response is List) {
+        List<Station> stations = response
+            .map((i) => Station.fromJson(i as Map<String, dynamic>))
+            .toList();
+        return stations;
+      } else {
+        throw Exception('API response is not a list');
+      }
     } catch (e) {
+      print(
+          'Error in fetchStations: $e'); // This will print any exception that occurs
       throw Exception('Failed to load stations');
     }
   }
@@ -131,7 +145,13 @@ class StationService extends ChangeNotifier {
     if (jsonResponse.isEmpty) {
       return [];
     } else {
-      return jsonResponse.map((item) => Station.fromJson(item)).toList();
+      try {
+        List<Station> stations =
+            jsonResponse.map((item) => Station.fromJson(item)).toList();
+        return stations;
+      } catch (e) {
+        throw Exception('Error while converting API response to List<Station>');
+      }
     }
   }
 }

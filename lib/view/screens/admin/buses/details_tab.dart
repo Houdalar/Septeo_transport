@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:septeo_transport/model/bus.dart';
-import '../../../../model/station.dart';
 import '../../../../viewmodel/bus_services.dart';
 import '../../../components/app_colors.dart';
-import 'station_sheet_selection.dart';
 
 enum EditState { viewing, editing }
 
@@ -31,8 +29,7 @@ class _BusDetailsTabState extends State<BusDetailsTab> {
   @override
   void initState() {
     super.initState();
-    _busNumberController =
-        TextEditingController(text: '${widget.bus.busNumber}');
+    _busNumberController = TextEditingController(text: widget.bus.busNumber);
     _capacityController = TextEditingController(text: '${widget.bus.capacity}');
   }
 
@@ -147,8 +144,9 @@ class _BusDetailsTabState extends State<BusDetailsTab> {
     if (_editState == EditState.editing) {
       String updatedBusNumber = _busNumberController.text;
       int updatedCapacity = int.parse(_capacityController.text);
-      bool isSuccess = await context.read<BusService>().updateBus(
-          widget.bus.id, updatedCapacity, updatedBusNumber);
+      bool isSuccess = await context
+          .read<BusService>()
+          .updateBus(widget.bus.id, updatedCapacity, updatedBusNumber);
       if (isSuccess) {
         setState(() {
           _editState = EditState.viewing;

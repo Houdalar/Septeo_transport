@@ -56,8 +56,6 @@ class _StationDetailsScreenState extends State<StationDetailsScreen2> {
         'https://api.openrouteservice.org/v2/directions/driving-car';
     const String apiKey =
         '5b3ce3597851110001cf6248f55d7a31499e40848c6848d7de8fa624';
-    print("start point $startPoint");
-    print(endPoint);
     return Uri.parse(
         '$baseUrl?api_key=$apiKey&start=$startPoint&end=$endPoint');
   }
@@ -65,7 +63,6 @@ class _StationDetailsScreenState extends State<StationDetailsScreen2> {
   void _getAndSetDirections() async {
     var response = await http.get(getRouteUrl(
         "1.243344,6.145332", '1.2160116523406839,6.125231015668568'));
-    print(response.body);
     setState(() {
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
@@ -84,7 +81,6 @@ class _StationDetailsScreenState extends State<StationDetailsScreen2> {
         body: Stack(
           children: <Widget>[
             FlutterMap(
-              
               options: MapOptions(zoom: 15, center: LatLng(6.131015, 1.223898)),
               children: [
                 // Layer that adds the map
@@ -125,7 +121,9 @@ class _StationDetailsScreenState extends State<StationDetailsScreen2> {
                   polylineCulling: false,
                   polylines: [
                     Polyline(
-                        points: points, color: const Color.fromARGB(255, 0, 4, 255), strokeWidth: 5),
+                        points: points,
+                        color: const Color.fromARGB(255, 0, 4, 255),
+                        strokeWidth: 5),
                   ],
                 ),
               ],

@@ -37,11 +37,13 @@ void main() async {
             sessionManager: context.read<SessionManager>(),
           ),
         ),
-         ChangeNotifierProvider(
-          create: (context) => StationService(apiService: context.read<ApiService>()),
+        ChangeNotifierProvider(
+          create: (context) =>
+              StationService(apiService: context.read<ApiService>()),
         ),
         ChangeNotifierProvider(
-          create: (context) => BusService(apiService: context.read<ApiService>()),
+          create: (context) =>
+              BusService(apiService: context.read<ApiService>()),
         ),
         Provider(create: (context) => FirebaseMessaging.instance),
         Provider(create: (context) => FlutterLocalNotificationsPlugin()),
@@ -75,18 +77,18 @@ class _MyAppState extends State<MyApp> {
     _firebaseMessaging = context.read<FirebaseMessaging>();
     _notificationsPlugin = context.read<FlutterLocalNotificationsPlugin>();
     _userViewModel = context.read<UserViewModel>();
-     _stationServices = context.read<StationService>();
+    _stationServices = context.read<StationService>();
     // _busServices = context.read<BusServices>();
 
-    _initializeUserId();
+    // _initializeUserId();
     initUniLinks();
     _firebaseMessaging.getToken().then((String? token) {
       assert(token != null);
     });
   }
 
-  Future<void> _initializeUserId() async {
-    userId = await context.read<SessionManager>().getUserId();
+  Future<String?> _initializeUserId() async {
+    return await context.read<SessionManager>().getUserId();
   }
 
   Future<void> initUniLinks() async {
@@ -136,19 +138,34 @@ class _MyAppState extends State<MyApp> {
           displayColor: AppColors.primaryDarkBlue,
         ),
       ),
+      home: FutureBuilder<String?>(
+        future: _initializeUserId(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              return Text('Error occurred while getting user ID');
+            }
+            if (snapshot.data == null) {
+              return const LoginPage();
+            } else {
+              return const Home();
+            }
+          } else {
+            return CircularProgressIndicator();
+          }
+        },
+      ),
       initialRoute: '/splash',
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':
-            return MaterialPageRoute(
-                builder: (context) => const LoginPage(
-                    ));
+            return MaterialPageRoute(builder: (context) => const LoginPage());
           case '/home':
             return MaterialPageRoute(builder: (context) => const Home());
           case '/splash':
             return MaterialPageRoute(
                 builder: (context) => SplashScreen(
-                      nextRoute: userId == "" ? '/' : '/home',
+                      nextRoute: userId == null ? '/' : '/home',
                     ));
           default:
             return null;

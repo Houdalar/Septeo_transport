@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:septeo_transport/viewmodel/station_services.dart';
 
 import '../../../../model/station.dart';
-import '../../../../viewmodel/station_services.dart';
 
 class StationSelectionScreen extends StatefulWidget {
-  final StationService stationService;
-
   const StationSelectionScreen({
     Key? key,
-    required this.stationService,
   }) : super(key: key);
 
   @override
@@ -28,7 +26,7 @@ class _StationSelectionScreenState extends State<StationSelectionScreen> {
 
   _getStationList() async {
     try {
-      var stations = await widget.stationService.getStations();
+      var stations = await context.read<StationService>().getStations();
       setState(() {
         allStations = stations;
         isLoading = false;

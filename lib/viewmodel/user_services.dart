@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:septeo_transport/model/planning.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import '../constatns.dart';
 import '../model/notification.dart';
 import '../model/user.dart';
@@ -31,14 +30,14 @@ class UserViewModel extends ChangeNotifier {
     };
 
     final response = await apiService.post("/login", userdata);
-    Map<String, dynamic> userData = response;
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(userData["token"]);
-    await sessionManager.saveUserId(decodedToken["id"]);
+    await sessionManager.saveUserId(response["_id"]);
     userId = await sessionManager.getUserId();
-    await sessionManager.saveRole(decodedToken["role"]);
+    print(userId);
+    await sessionManager.saveRole(response["role"]);
+    print(await sessionManager.getRole());
 
     Role role;
-    switch (decodedToken['role']) {
+    switch (response['role']) {
       case 'Admin':
         role = Role.Admin;
         break;
@@ -52,17 +51,17 @@ class UserViewModel extends ChangeNotifier {
         role = Role.Employee;
         break;
     }
-
+    print("Navigator is called with role: ${response['role']}");
     Navigator.pushReplacementNamed(context, '/home', arguments: role);
+    // Navigator.pushReplacementNamed(context, '/home', arguments: role);
   }
 
-   Future<List<User>> getDrivers() async {
+  Future<List<User>> getDrivers() async {
     final response = await apiService.get("/drivers");
 
     List jsonResponse = response;
     return jsonResponse.map((item) => User.fromJson(item)).toList();
   }
-
 
   Future<Planning> getPlanning() async {
     if (userId == null || userId!.isEmpty) {
@@ -74,7 +73,6 @@ class UserViewModel extends ChangeNotifier {
     return Planning.fromJson(response);
   }
 
-
   Future<List<Planning>> getPlannings() async {
     await initUserId();
     if (userId == null || userId!.isEmpty) {
@@ -85,7 +83,6 @@ class UserViewModel extends ChangeNotifier {
     List jsonResponse = response;
     return jsonResponse.map((item) => Planning.fromJson(item)).toList();
   }
-
 
   Future<Planning> addPlanning({
     required String date,
@@ -124,14 +121,14 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
- Future<void> deletePlanning(String id) async {
+  Future<void> deletePlanning(String id) async {
     await apiService.delete('planning/$id');
     List<Planning> plannings = await getPlannings();
     plannings.removeWhere((planning) => planning.id == id);
     notifyListeners();
   }
 
- Future<bool> updatePlanning({
+  Future<bool> updatePlanning({
     required String id,
     required String date,
     required String fromStationId,
@@ -152,7 +149,7 @@ class UserViewModel extends ChangeNotifier {
     return responseBody != null;
   }
 
-   Future<Planning?> getTodayPlanning() async {
+  Future<Planning?> getTodayPlanning() async {
     if (userId == null || userId!.isEmpty) {
       throw Exception('User is not logged in');
     }
@@ -175,7 +172,7 @@ class UserViewModel extends ChangeNotifier {
     return User.fromJson(responseBody);
   }
 
- Future<User> createUser({
+  Future<User> createUser({
     required String email,
     required String password,
     required String username,

@@ -1,9 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:septeo_transport/model/bus.dart';
-
 
 import 'package:permission_handler/permission_handler.dart';
 
@@ -23,18 +19,24 @@ class BusService extends ChangeNotifier {
   List<Bus> get bus => [..._bus];
   BusService({required this.apiService});
 
-
-
   Future<List<Bus>> getBus() async {
     try {
       final jsonResponse = await apiService.get('/buses');
-      return jsonResponse.map((model) => Bus.fromJson(model)).toList();
+
+      if (jsonResponse is List) {
+        return jsonResponse
+            .map((model) => Bus.fromJson(model as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw Exception('API response is not a list');
+      }
     } catch (e) {
       throw Exception('Failed to load buses');
     }
   }
 
-  Future<void> createNewBus(int capacity, String busNumber, BuildContext context) async {
+  Future<void> createNewBus(
+      int capacity, String busNumber, BuildContext context) async {
     try {
       await apiService.post('/bus', {
         'capacity': capacity,
@@ -65,6 +67,4 @@ class BusService extends ChangeNotifier {
       return false;
     }
   }
-
-  
 }
