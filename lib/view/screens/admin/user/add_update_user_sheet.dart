@@ -65,19 +65,19 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
     if (_formKey.currentState!.validate()) {
       if (widget.user != null) {
         await context.read<UserViewModel>().updateUser(
-          id : widget.user!.id,
-          email:emailController.text,
-         username: usernameController.text,
-          password :passwordController.text,
-          role:_selectedRole!,
-        );
+              id: widget.user!.id,
+              email: emailController.text,
+              username: usernameController.text,
+              password: passwordController.text,
+              role: _selectedRole!,
+            );
       } else {
         await context.read<UserViewModel>().createUser(
-          email :emailController.text,
-          password :usernameController.text,
-          username : passwordController.text,
-          role :_selectedRole!,
-        );
+              email: emailController.text,
+              password: usernameController.text,
+              username: passwordController.text,
+              role: _selectedRole!,
+            );
       }
       Navigator.pop(context);
     }
@@ -102,8 +102,8 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
                     const Icon(Icons.lock, color: AppColors.auxiliaryGrey)),
                 DropdownButtonFormField<String>(
                   value: _selectedRole,
-                  items:
-                      <String>['Admin', 'Employee', 'Driver'].map((String value) {
+                  items: <String>['Admin', 'Employee', 'Driver']
+                      .map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -130,9 +130,20 @@ class _AddOrUpdateUserSheetState extends State<AddOrUpdateUserSheet> {
                   ),
                 ),
                 const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: _handleUserAction,
-                  child: Text(widget.user != null ? 'Update' : 'Add'),
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _handleUserAction,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryOrange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32.0),
+                      ),
+                      padding: const EdgeInsets.all(16.0),
+                    ),
+                    child: Text(widget.user != null ? 'Update' : 'Add'),
+                  ),
                 ),
               ],
             ),

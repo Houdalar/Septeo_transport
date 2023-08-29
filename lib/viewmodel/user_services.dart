@@ -160,7 +160,13 @@ class UserViewModel extends ChangeNotifier {
 
   Future<List<User>> getUsers() async {
     final responseBody = await apiService.get('/users');
-    return responseBody.map((data) => User.fromJson(data)).toList();
+    if (responseBody is List) {
+      return responseBody
+          .map((data) => User.fromJson(data as Map<String, dynamic>))
+          .toList();
+    } else {
+      throw Exception('Failed to load users');
+    }
   }
 
   Future<User> getUser() async {
